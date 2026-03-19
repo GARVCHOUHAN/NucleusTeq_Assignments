@@ -76,3 +76,12 @@ section h2{
     color:#4a90e2;
 }
 
+#skills ul{
+    margin-left:20px;
+    line-height:1.8;
+}
+
+#skills h3{
+    margin-top:10px;
+    font-weight:bold;
+}
