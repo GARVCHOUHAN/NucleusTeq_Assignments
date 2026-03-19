@@ -107,3 +107,17 @@ table td{
 table tr:nth-child(even){
     background:#f2f2f2;
 }
+
+#projects li{
+    margin-bottom:20px;
+}
+
+#projects a{
+    color:#4a90e2;
+    text-decoration:none;
+    transition:color 0.3s ease;
+}
+
+#projects a:hover{
+    color:#ff6600;
+}
