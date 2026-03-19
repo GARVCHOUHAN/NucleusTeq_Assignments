@@ -85,3 +85,25 @@ section h2{
     margin-top:10px;
     font-weight:bold;
 }
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+table th{
+    background:#4a90e2;
+    color:white;
+    padding:10px;
+    text-align:center;
+}
+
+table td{
+    border:1px solid #ccc;
+    padding:8px;
+}
+
+table tr:nth-child(even){
+    background:#f2f2f2;
+}
