@@ -121,3 +121,44 @@ table tr:nth-child(even){
 #projects a:hover{
     color:#ff6600;
 }
+
+form{
+    margin-top:10px;
+}
+
+label{
+    display:block;
+    margin-top:10px;
+    font-weight:bold;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    padding:8px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:4px;
+}
+
+textarea{
+    height:100px;
+}
+
+input[type="submit"],
+input[type="reset"]{
+    margin-top:10px;
+    width:auto;
+    background:#4a90e2;
+    color:white;
+    border:none;
+    padding:8px 16px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+input[type="submit"]:hover,
+input[type="reset"]:hover{
+    background:#357abd;
+}
