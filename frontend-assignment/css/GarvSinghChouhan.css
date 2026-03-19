@@ -38,3 +38,27 @@ header p{
     color:#555;
 }
 
+nav ul{
+    display:flex;
+    justify-content:center;
+    list-style:none;
+    background:#4a90e2;
+    padding:10px;
+    border-radius:6px;
+}
+
+nav ul li{
+    margin:0 15px;
+    color:white;
+    font-weight:bold;
+}
+
+nav ul li a{
+    text-decoration:none;
+    color:white;
+    font-weight:bold;
+}
+
+nav ul li a:hover{
+    color:#ffd700;
+}
