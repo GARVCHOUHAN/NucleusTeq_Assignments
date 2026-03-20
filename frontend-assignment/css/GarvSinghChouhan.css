@@ -162,3 +162,20 @@ input[type="submit"]:hover,
 input[type="reset"]:hover{
     background:#357abd;
 }
+
+
+footer{
+    text-align:center;
+    margin-top:30px;
+    padding:15px;
+    background:#333;
+    color:white;
+    font-size:14px;
+    border-radius:6px;
+}
+
+footer a{
+    color:#ffd700;
+    text-decoration:none;
+}
+
