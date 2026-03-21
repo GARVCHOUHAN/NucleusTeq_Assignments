@@ -84,3 +84,48 @@ function getStudentGrade(student) {
     return "Fail";
   }
 }
+
+function printStudentResults(studentList) {
+  console.log("===== STUDENT TOTALS, AVERAGES, AND GRADES =====");
+
+  for (let i = 0; i < studentList.length; i++) {
+    const student = studentList[i];
+    const total = calculateTotalMarks(student);
+    const average = calculateAverageMarks(student);
+    const grade = getStudentGrade(student);
+
+    console.log(`${student.name} Total Marks: ${total}`);
+    console.log(`${student.name} Average: ${average.toFixed(1)}`);
+    console.log(`${student.name} Grade: ${grade}`);
+    console.log("-----------------------------------");
+  }
+}
+
+
+function getSubjectWiseHighest(studentList) {
+  console.log("===== SUBJECT-WISE HIGHEST SCORES =====");
+
+  const subjects = studentList[0].marks;
+
+  for (let i = 0; i < subjects.length; i++) {
+    const currentSubject = subjects[i].subject;
+    let highestScore = -1;
+    let highestScorer = "";
+
+    for (let j = 0; j < studentList.length; j++) {
+      const student = studentList[j];
+
+      for (let k = 0; k < student.marks.length; k++) {
+        if (
+          student.marks[k].subject === currentSubject &&
+          student.marks[k].score > highestScore
+        ) {
+          highestScore = student.marks[k].score;
+          highestScorer = student.name;
+        }
+      }
+    }
+
+    console.log(`Highest in ${currentSubject}: ${highestScorer} (${highestScore})`);
+  }
+}
