@@ -129,3 +129,27 @@ function getSubjectWiseHighest(studentList) {
     console.log(`Highest in ${currentSubject}: ${highestScorer} (${highestScore})`);
   }
 }
+
+function getSubjectWiseAverage(studentList) {
+  console.log("===== SUBJECT-WISE AVERAGE SCORES =====");
+
+  const subjects = studentList[0].marks;
+
+  for (let i = 0; i < subjects.length; i++) {
+    const currentSubject = subjects[i].subject;
+    let total = 0;
+
+    for (let j = 0; j < studentList.length; j++) {
+      const student = studentList[j];
+
+      for (let k = 0; k < student.marks.length; k++) {
+        if (student.marks[k].subject === currentSubject) {
+          total += student.marks[k].score;
+        }
+      }
+    }
+
+    const average = total / studentList.length;
+    console.log(`Average ${currentSubject} Score: ${average.toFixed(1)}`);
+  }
+}
