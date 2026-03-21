@@ -55,3 +55,8 @@ function calculateTotalMarks(student) {
 
   return total;
 }
+
+function calculateAverageMarks(student) {
+  const total = calculateTotalMarks(student);
+  return total / student.marks.length;
+}
