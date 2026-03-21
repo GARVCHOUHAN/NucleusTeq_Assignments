@@ -60,3 +60,27 @@ function calculateAverageMarks(student) {
   const total = calculateTotalMarks(student);
   return total / student.marks.length;
 }
+
+function getStudentGrade(student) {
+  if (student.attendance < 75) {
+    return "Fail (Low Attendance)";
+  }
+
+  for (let i = 0; i < student.marks.length; i++) {
+    if (student.marks[i].score <= 40) {
+      return `Fail (Failed in ${student.marks[i].subject})`;
+    }
+  }
+
+  const average = calculateAverageMarks(student);
+
+  if (average >= 85) {
+    return "A";
+  } else if (average >= 70) {
+    return "B";
+  } else if (average >= 50) {
+    return "C";
+  } else {
+    return "Fail";
+  }
+}
