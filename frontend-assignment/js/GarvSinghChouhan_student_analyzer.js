@@ -153,3 +153,27 @@ function getSubjectWiseAverage(studentList) {
     console.log(`Average ${currentSubject} Score: ${average.toFixed(1)}`);
   }
 }
+
+
+function getClassTopper(studentList) {
+  let topperName = "";
+  let highestTotal = -1;
+
+  for (let i = 0; i < studentList.length; i++) {
+    const total = calculateTotalMarks(studentList[i]);
+
+    if (total > highestTotal) {
+      highestTotal = total;
+      topperName = studentList[i].name;
+    }
+  }
+
+  console.log("===== CLASS TOPPER =====");
+  console.log(`Class Topper: ${topperName} with ${highestTotal} marks`);
+}
+
+// Main execution
+printStudentResults(students);
+getSubjectWiseHighest(students);
+getSubjectWiseAverage(students);
+getClassTopper(students);
