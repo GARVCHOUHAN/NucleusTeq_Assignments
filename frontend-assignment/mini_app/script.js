@@ -308,3 +308,87 @@ function startEditingProduct(productId) {
     behavior: "smooth"
   });
 }
+
+function clearErrors() {
+  nameError.textContent = "";
+  priceError.textContent = "";
+  stockError.textContent = "";
+  categoryError.textContent = "";
+}
+
+function resetForm() {
+  productForm.reset();
+  editingProductId = null;
+  formTitle.textContent = "Add New Product";
+  submitBtn.textContent = "Add Product";
+  cancelEditBtn.classList.add("hidden");
+  clearErrors();
+}
+
+function validateForm() {
+  clearErrors();
+
+  let isValid = true;
+
+  if (productName.value.trim() === "") {
+    nameError.textContent = "Product name is required.";
+    isValid = false;
+  }
+
+  if (productPrice.value.trim() === "" || Number(productPrice.value) <= 0) {
+    priceError.textContent = "Price must be greater than 0.";
+    isValid = false;
+  }
+
+  if (productStock.value.trim() === "" || Number(productStock.value) < 0) {
+    stockError.textContent = "Stock cannot be negative.";
+    isValid = false;
+  }
+
+  if (productCategory.value === "") {
+    categoryError.textContent = "Please select a category.";
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+function generateUniqueId() {
+  return Date.now();
+}
+
+function handleFormSubmit(event) {
+  event.preventDefault();
+
+  if (!validateForm()) {
+    return;
+  }
+
+  const newProductData = {
+    name: productName.value.trim(),
+    price: Number(productPrice.value),
+    stock: Number(productStock.value),
+    category: productCategory.value
+  };
+
+  if (editingProductId !== null) {
+    products = products.map((product) =>
+      product.id === editingProductId
+        ? { ...product, ...newProductData }
+        : product
+    );
+  } else {
+    const newProduct = {
+      id: generateUniqueId(),
+      ...newProductData
+    };
+
+    products.push(newProduct);
+  }
+
+  saveProductsToStorage();
+  populateCategoryFilter();
+  updateAnalytics();
+  renderProducts();
+  resetForm();
+}
