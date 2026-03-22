@@ -110,3 +110,100 @@ body {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.checkbox-group {
+  justify-content: flex-end;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 4px;
+}
+
+.checkbox-wrapper input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+}
+
+.checkbox-wrapper span {
+  color: var(--muted-text);
+  font-size: 0.92rem;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.primary-btn,
+.secondary-btn,
+.delete-btn,
+.edit-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.primary-btn {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.primary-btn:hover {
+  background: var(--primary-hover);
+}
+
+.secondary-btn {
+  background: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.secondary-btn:hover {
+  background: var(--secondary-hover);
+}
+
+.analytics-section {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.analytics-card {
+  background: var(--card-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
+}
+
+.analytics-card h3 {
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: var(--muted-text);
+}
+
+.analytics-card p {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.category-card {
+  min-height: 100%;
+}
+
