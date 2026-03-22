@@ -71,3 +71,31 @@ async function fetchProductsFromAPI() {
   }));
 }
 
+function fetchProductsWithDelay() {
+  return new Promise((resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        const savedProducts = loadProductsFromStorage();
+
+        if (savedProducts && savedProducts.length > 0) {
+          resolve(savedProducts);
+          return;
+        }
+
+        const apiProducts = await fetchProductsFromAPI();
+        resolve(apiProducts);
+      } catch (error) {
+        reject(error);
+      }
+    }, 1500);
+  });
+}
+
+function formatCurrency(amount) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
