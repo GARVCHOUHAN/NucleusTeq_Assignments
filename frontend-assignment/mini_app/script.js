@@ -392,3 +392,50 @@ function handleFormSubmit(event) {
   renderProducts();
   resetForm();
 }
+
+function resetFilters() {
+  searchInput.value = "";
+  categoryFilter.value = "all";
+  sortOption.value = "default";
+  lowStockOnly.checked = false;
+  renderProducts();
+}
+
+function attachControlEvents() {
+  searchInput.addEventListener("input", renderProducts);
+  categoryFilter.addEventListener("change", renderProducts);
+  sortOption.addEventListener("change", renderProducts);
+  lowStockOnly.addEventListener("change", renderProducts);
+  resetFiltersBtn.addEventListener("click", resetFilters);
+  productForm.addEventListener("submit", handleFormSubmit);
+  cancelEditBtn.addEventListener("click", resetForm);
+}
+
+async function initializeApp() {
+  attachControlEvents();
+
+  loadingState.classList.remove("hidden");
+  productGrid.classList.add("hidden");
+  emptyState.classList.add("hidden");
+
+  try {
+    products = await fetchProductsWithDelay();
+
+    if (!products || products.length === 0) {
+      products = [...defaultProducts];
+    }
+
+    saveProductsToStorage();
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    products = [...defaultProducts];
+    saveProductsToStorage();
+  }
+
+  populateCategoryFilter();
+  updateAnalytics();
+  loadingState.classList.add("hidden");
+  renderProducts();
+}
+
+initializeApp();
