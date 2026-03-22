@@ -99,3 +99,107 @@ function formatCurrency(amount) {
   }).format(amount);
 }
 
+function capitalizeWord(text) {
+  return text
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function getStockStatus(stock) {
+  if (stock === 0) {
+    return { text: "Out of Stock", className: "out-of-stock" };
+  }
+
+  if (stock < 5) {
+    return { text: "Low Stock", className: "low-stock" };
+  }
+
+  return { text: "In Stock", className: "in-stock" };
+}
+
+function populateCategoryFilter() {
+  const categories = [...new Set(products.map((product) => product.category))].sort();
+  const currentSelectedValue = categoryFilter.value;
+
+  categoryFilter.innerHTML = `<option value="all">All Categories</option>`;
+
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = capitalizeWord(category);
+    categoryFilter.appendChild(option);
+  });
+
+  const optionExists = [...categoryFilter.options].some(
+    (option) => option.value === currentSelectedValue
+  );
+
+  categoryFilter.value = optionExists ? currentSelectedValue : "all";
+}
+
+function updateAnalytics() {
+  totalProducts.textContent = products.length;
+
+  const inventoryValue = products.reduce((total, product) => {
+    return total + product.price * product.stock;
+  }, 0);
+
+  totalInventoryValue.textContent = formatCurrency(inventoryValue);
+
+  const outOfStockProducts = products.filter((product) => product.stock === 0).length;
+  outOfStockCount.textContent = outOfStockProducts;
+
+  const countsByCategory = products.reduce((accumulator, product) => {
+    accumulator[product.category] = (accumulator[product.category] || 0) + 1;
+    return accumulator;
+  }, {});
+
+  categoryCounts.innerHTML = "";
+
+  Object.keys(countsByCategory)
+    .sort()
+    .forEach((category) => {
+      const badge = document.createElement("span");
+      badge.className = "category-badge";
+      badge.textContent = `${capitalizeWord(category)}: ${countsByCategory[category]}`;
+      categoryCounts.appendChild(badge);
+    });
+}
+
+function getFilteredAndSortedProducts() {
+  const searchTerm = searchInput.value.trim().toLowerCase();
+  const selectedCategory = categoryFilter.value;
+  const selectedSort = sortOption.value;
+  const showLowStockOnly = lowStockOnly.checked;
+
+  let filteredProducts = [...products];
+
+  filteredProducts = filteredProducts.filter((product) => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm);
+    const matchesCategory =
+      selectedCategory === "all" || product.category === selectedCategory;
+    const matchesLowStock = !showLowStockOnly || product.stock < 5;
+
+    return matchesSearch && matchesCategory && matchesLowStock;
+  });
+
+  switch (selectedSort) {
+    case "priceLowToHigh":
+      filteredProducts.sort((a, b) => a.price - b.price);
+      break;
+    case "priceHighToLow":
+      filteredProducts.sort((a, b) => b.price - a.price);
+      break;
+    case "nameAToZ":
+      filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case "nameZToA":
+      filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+      break;
+    default:
+      break;
+  }
+
+  return filteredProducts;
+}
