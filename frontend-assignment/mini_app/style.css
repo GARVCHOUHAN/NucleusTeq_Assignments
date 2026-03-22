@@ -299,3 +299,51 @@ body {
   font-size: 0.95rem;
 }
 
+.stock-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.in-stock {
+  background: var(--success-bg);
+  color: #166534;
+}
+
+.low-stock {
+  background: var(--warning-bg);
+  color: #92400e;
+}
+
+.out-of-stock {
+  background: var(--danger-bg);
+  color: #991b1b;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.edit-btn {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.edit-btn:hover {
+  background: #e5e7eb;
+}
+
+.delete-btn {
+  background: var(--danger-color);
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background: var(--danger-hover);
+}
+
