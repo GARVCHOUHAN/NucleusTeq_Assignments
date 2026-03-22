@@ -203,3 +203,108 @@ function getFilteredAndSortedProducts() {
 
   return filteredProducts;
 }
+
+function renderProducts() {
+  const displayProducts = getFilteredAndSortedProducts();
+  productGrid.innerHTML = "";
+
+  if (displayProducts.length === 0) {
+    emptyState.classList.remove("hidden");
+    productGrid.classList.add("hidden");
+    return;
+  }
+
+  emptyState.classList.add("hidden");
+  productGrid.classList.remove("hidden");
+
+  displayProducts.forEach((product) => {
+    const status = getStockStatus(product.stock);
+
+    const card = document.createElement("div");
+    card.className = "product-card";
+
+    card.innerHTML = `
+      <h3>${product.name}</h3>
+      <p class="product-meta"><strong>Category:</strong> ${capitalizeWord(product.category)}</p>
+      <p class="product-meta"><strong>Price:</strong> ${formatCurrency(product.price)}</p>
+      <p class="product-meta"><strong>Stock:</strong> ${product.stock}</p>
+      <span class="stock-badge ${status.className}">${status.text}</span>
+      <div class="card-actions">
+        <button class="edit-btn" data-id="${product.id}" type="button">Edit</button>
+        <button class="delete-btn" data-id="${product.id}" type="button">Delete</button>
+      </div>
+    `;
+
+    productGrid.appendChild(card);
+  });
+
+  attachCardButtonEvents();
+}
+
+function attachCardButtonEvents() {
+  const deleteButtons = document.querySelectorAll(".delete-btn");
+  const editButtons = document.querySelectorAll(".edit-btn");
+
+  deleteButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = Number(button.dataset.id);
+      deleteProduct(productId);
+    });
+  });
+
+  editButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = Number(button.dataset.id);
+      startEditingProduct(productId);
+    });
+  });
+}
+
+function deleteProduct(productId) {
+  const productToDelete = products.find((product) => product.id === productId);
+
+  if (!productToDelete) {
+    return;
+  }
+
+  const isConfirmed = confirm(`Delete "${productToDelete.name}"?`);
+
+  if (!isConfirmed) {
+    return;
+  }
+
+  products = products.filter((product) => product.id !== productId);
+
+  saveProductsToStorage();
+  populateCategoryFilter();
+  updateAnalytics();
+  renderProducts();
+
+  if (editingProductId === productId) {
+    resetForm();
+  }
+}
+
+function startEditingProduct(productId) {
+  const product = products.find((item) => item.id === productId);
+
+  if (!product) {
+    return;
+  }
+
+  editingProductId = productId;
+
+  productName.value = product.name;
+  productPrice.value = product.price;
+  productStock.value = product.stock;
+  productCategory.value = product.category;
+
+  formTitle.textContent = "Edit Product";
+  submitBtn.textContent = "Update Product";
+  cancelEditBtn.classList.remove("hidden");
+
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
+  });
+}
