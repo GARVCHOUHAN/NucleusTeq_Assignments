@@ -347,3 +347,56 @@ body {
   background: var(--danger-hover);
 }
 
+.error-message {
+  color: var(--danger-color);
+  min-height: 18px;
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 992px) {
+  .controls-grid,
+  .form-grid,
+  .analytics-section,
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 94%;
+    margin-top: 20px;
+  }
+
+  .header {
+    padding: 24px 18px;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .controls-grid,
+  .form-grid,
+  .analytics-section,
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .button-row,
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .primary-btn,
+  .secondary-btn,
+  .edit-btn,
+  .delete-btn {
+    width: 100%;
+  }
+}
