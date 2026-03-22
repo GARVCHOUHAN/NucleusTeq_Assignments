@@ -108,7 +108,91 @@
       <div id="productGrid" class="product-grid hidden"></div>
     </section>
 
-    
+    <section class="form-section card">
+      <div class="section-header">
+        <h2 id="formTitle">Add New Product</h2>
+        <p class="section-subtext">Fill in the details below to add or edit a product.</p>
+      </div>
+
+      <form id="productForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="productName">Product Name</label>
+            <input
+              type="text"
+              id="productName"
+              placeholder="Enter product name"
+            />
+            <small class="error-message" id="nameError"></small>
+          </div>
+
+          <div class="form-group">
+            <label for="productPrice">Price</label>
+            <input
+              type="number"
+              id="productPrice"
+              placeholder="Enter price"
+              min="1"
+            />
+            <small class="error-message" id="priceError"></small>
+          </div>
+
+          <div class="form-group">
+            <label for="productStock">Stock Quantity</label>
+            <input
+              type="number"
+              id="productStock"
+              placeholder="Enter stock quantity"
+              min="0"
+            />
+            <small class="error-message" id="stockError"></small>
+          </div>
+
+          <div class="form-group">
+            <label for="productCategory">Category</label>
+            <select id="productCategory">
+              <option value="">Select Category</option>
+              <option value="beauty">Beauty</option>
+              <option value="fragrances">Fragrances</option>
+              <option value="furniture">Furniture</option>
+              <option value="groceries">Groceries</option>
+              <option value="home-decoration">Home Decoration</option>
+              <option value="kitchen-accessories">Kitchen Accessories</option>
+              <option value="laptops">Laptops</option>
+              <option value="mens-shirts">Men's Shirts</option>
+              <option value="mens-shoes">Men's Shoes</option>
+              <option value="mens-watches">Men's Watches</option>
+              <option value="mobile-accessories">Mobile Accessories</option>
+              <option value="smartphones">Smartphones</option>
+              <option value="sports-accessories">Sports Accessories</option>
+              <option value="sunglasses">Sunglasses</option>
+              <option value="tablets">Tablets</option>
+              <option value="tops">Tops</option>
+              <option value="vehicle">Vehicle</option>
+              <option value="womens-bags">Women's Bags</option>
+              <option value="womens-dresses">Women's Dresses</option>
+              <option value="womens-jewellery">Women's Jewellery</option>
+              <option value="womens-shoes">Women's Shoes</option>
+              <option value="womens-watches">Women's Watches</option>
+            </select>
+            <small class="error-message" id="categoryError"></small>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button type="submit" id="submitBtn" class="primary-btn">
+            Add Product
+          </button>
+          <button
+            type="button"
+            id="cancelEditBtn"
+            class="secondary-btn hidden"
+          >
+            Cancel Edit
+          </button>
+        </div>
+      </form>
+    </section>
   </div>
 
   <script src="script.js"></script>
