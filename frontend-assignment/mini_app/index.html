@@ -89,6 +89,25 @@
       </div>
     </section>
 
+    <section class="products-section card">
+      <div class="section-header">
+        <h2>Product List</h2>
+        <p class="section-subtext">All products are rendered dynamically from JavaScript.</p>
+      </div>
+
+      <div id="loadingState" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading products...</p>
+      </div>
+
+      <div id="emptyState" class="empty-state hidden">
+        <h3>No products found</h3>
+        <p>No matching items are available right now. Try changing filters or adding a new product.</p>
+      </div>
+
+      <div id="productGrid" class="product-grid hidden"></div>
+    </section>
+
     
   </div>
 
