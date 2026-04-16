@@ -4,7 +4,7 @@ import com.session3.usersearchsystem.dto.UserRequestDTO
 import com.session3.usersearchsystem.service.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-
+import com.session3.usersearchsystem.model.User
 
 // Controller layer handles API requests
 // No business logic should be written here
