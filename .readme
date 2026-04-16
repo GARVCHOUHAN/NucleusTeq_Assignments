@@ -1,0 +1,9 @@
+﻿Primitive Types:
+- int, float, double, char, boolean
+- Stored in stack
+- Example: int a = 10;
+
+Reference Types:
+- Objects, arrays, strings
+- Stored in heap
+- Example: String name = "Garv";
