@@ -8,14 +8,29 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
         </processorPath>
         <module name="usermanagement" />
       </profile>
+      <profile name="Annotation profile for usersearchsystem" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.44/lombok-1.18.44.jar" />
+        </processorPath>
+        <module name="usersearchsystem" />
+      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="userManagement (1) (com.session3)" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="userManagement (1) (com.session3)" options="-parameters" />
       <module name="usermanagement" options="-parameters" />
+      <module name="usersearchsystem" options="-parameters" />
     </option>
   </component>
 </project>

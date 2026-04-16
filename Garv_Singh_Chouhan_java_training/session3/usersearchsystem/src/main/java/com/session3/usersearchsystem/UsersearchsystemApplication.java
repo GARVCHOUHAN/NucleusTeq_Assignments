@@ -1,15 +1,13 @@
-package com.session2.usermanagement;
-
+package com.session3.usersearchsystem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class UsermanagementApplication {
+public class UsersearchsystemApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(UsermanagementApplication.class, args);
+        SpringApplication.run(UsersearchsystemApplication.class, args);
     }
 
 }
-
