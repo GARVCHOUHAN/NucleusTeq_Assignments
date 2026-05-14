@@ -65,7 +65,7 @@ class ClaimResponse {
  */
 @Data
 @Builder
-class ErrorResponse {
+public class ErrorResponse {
 
     private int status;
     private String error;
