@@ -73,5 +73,5 @@ async function rejectClaim(id) {
         }
     );
 
-    loadClaims();
+    await loadClaims();
 }
