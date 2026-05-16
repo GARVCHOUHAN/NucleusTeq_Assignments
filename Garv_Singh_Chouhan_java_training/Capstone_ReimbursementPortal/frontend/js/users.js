@@ -32,7 +32,7 @@ userForm.addEventListener("submit", async (e) => {
 
         alert("User Created Successfully");
 
-        loadUsers();
+        await loadUsers();
 
         userForm.reset();
 
@@ -82,7 +82,9 @@ async function deleteUser(id) {
         method: "DELETE"
     });
 
-    loadUsers();
+    await loadUsers();
 }
 
-loadUsers();
+loadUsers().then(r => {
+    
+});
