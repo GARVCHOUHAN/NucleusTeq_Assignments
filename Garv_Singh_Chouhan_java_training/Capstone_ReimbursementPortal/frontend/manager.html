@@ -1,35 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <title>Manager Dashboard</title>
-
-    <link rel="stylesheet" href="css/style.css">
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReimburseHub — Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css" />
 </head>
-
 <body>
 
-<div class="container">
+<aside class="sidebar">
+    <div class="logo">
+        <div class="logo-name">Reimburse<span>Hub</span></div>
+        <div class="logo-sub">Manager Panel</div>
+    </div>
+    <nav class="nav">
+        <p class="nav-section">Claims</p>
+        <a href="#" class="nav-link active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            Assigned Claims
+            <span class="nav-badge amber" id="pendingBadge">–</span>
+        </a>
+    </nav>
+    <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">MG</div>
+        <div>
+            <div class="sidebar-name" id="sidebarName">Manager</div>
+            <div class="sidebar-email" id="sidebarEmail">manager@company.com</div>
+        </div>
+    </div>
+    <button class="btn btn-ghost btn-block logout-btn" onclick="logout()">Logout</button>
+</aside>
 
-    <h1>Manager Dashboard</h1>
+<main class="main">
+    <header class="topbar">
+        <div>
+            <h1 class="page-heading">Assigned Claims</h1>
+            <p class="page-sub">Review and take action on employee claims</p>
+        </div>
+        <div class="topbar-actions">
+            <select class="filter-select" id="statusFilter" onchange="loadManagerClaims()">
+                <option value="">All Statuses</option>
+                <option value="SUBMITTED">Submitted</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REJECTED">Rejected</option>
+            </select>
+        </div>
+    </header>
 
-    <input type="number"
-           id="reviewerId"
-           placeholder="Manager ID">
+    <div class="content">
+        <!-- Claims Cards -->
+        <div id="claimsGrid" class="claims-grid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+</main>
 
-    <button onclick="loadClaims()">
-        Load Claims
-    </button>
-
-    <div id="managerClaims"></div>
-
+<!-- APPROVE MODAL — optional message when approving -->
+<div class="overlay" id="approveOverlay">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h2 class="modal-title">Approve Claim</h2>
+            <button class="modal-close" onclick="closeApproveModal()">&#x2715;</button>
+        </div>
+        <div class="form-hint">You can add an optional note for the employee.</div>
+        <div class="form-group">
+            <label>Message <span class="label-optional">(optional)</span></label>
+            <textarea class="form-input" id="approveComment" rows="3"
+                      placeholder="e.g. Approved — please attach receipts next time."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeApproveModal()">Cancel</button>
+            <button class="btn btn-success" id="confirmApproveBtn" onclick="confirmApprove()">
+                <span id="approveBtnLabel">Confirm Approval</span>
+                <span class="spinner" id="approveSpinner"></span>
+            </button>
+        </div>
+    </div>
 </div>
 
+<!-- REJECT MODAL — collects a comment before rejecting -->
+<div class="overlay" id="rejectOverlay">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h2 class="modal-title">Reject Claim</h2>
+            <button class="modal-close" onclick="closeRejectModal()">&#x2715;</button>
+        </div>
+        <div class="form-group">
+            <label>Reason for Rejection *</label>
+            <textarea class="form-input" id="rejectComment" rows="3"
+                      placeholder="Explain why this claim is being rejected…"></textarea>
+            <span class="form-error" id="errRejectComment">A comment is required to reject.</span>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeRejectModal()">Cancel</button>
+            <button class="btn btn-danger" id="confirmRejectBtn" onclick="confirmReject()">
+                <span id="rejectLabel">Reject Claim</span>
+                <span class="spinner" id="rejectSpinner"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/claims.js"></script>
 <script src="js/manager.js"></script>
 
 </body>
 </html>
+
+

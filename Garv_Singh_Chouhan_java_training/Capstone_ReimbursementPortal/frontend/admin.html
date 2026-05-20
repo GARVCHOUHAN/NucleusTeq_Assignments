@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReimburseHub — Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     SIDEBAR
+══════════════════════════════════ -->
+<aside class="sidebar">
+    <div class="logo">
+        <div class="logo-name">Reimburse<span>Hub</span></div>
+        <div class="logo-sub">Admin Panel</div>
+    </div>
+
+    <nav class="nav">
+        <p class="nav-section">Management</p>
+        <a href="#" class="nav-link active" data-tab="users">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Users
+            <span class="nav-badge" id="userCountBadge">–</span>
+        </a>
+        <a href="#" class="nav-link" data-tab="claims">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            All Claims
+        </a>
+    </nav>
+
+    <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">AD</div>
+        <div>
+            <div class="sidebar-name" id="sidebarName">Administrator</div>
+            <div class="sidebar-email" id="sidebarEmail">admin@company.com</div>
+        </div>
+    </div>
+
+    <button class="btn btn-ghost btn-block logout-btn" onclick="logout()">Logout</button>
+</aside>
+
+<!-- ══════════════════════════════════
+     MAIN
+══════════════════════════════════ -->
+<main class="main">
+
+    <!-- ── TOPBAR ── -->
+    <header class="topbar">
+        <div>
+            <h1 class="page-heading" id="pageHeading">Team Members</h1>
+            <p class="page-sub" id="pageSub">Manage all users</p>
+        </div>
+        <div class="topbar-actions">
+            <button class="btn btn-ghost" id="refreshBtn" onclick="refreshPage()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+                Refresh
+            </button>
+            <button class="btn btn-primary" id="addUserBtn" onclick="openAddUserModal()">+ Add User</button>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <!-- ════ USERS TAB ════ -->
+        <div id="tabUsers">
+
+            <!-- Stat Cards -->
+            <div class="stat-grid">
+                <div class="stat-card border-amber">
+                    <div class="stat-num" id="statAdmin">–</div>
+                    <div class="stat-label">Admins</div>
+                </div>
+                <div class="stat-card border-blue">
+                    <div class="stat-num" id="statManager">–</div>
+                    <div class="stat-label">Managers</div>
+                </div>
+                <div class="stat-card border-green">
+                    <div class="stat-num" id="statEmployee">–</div>
+                    <div class="stat-label">Employees</div>
+                </div>
+                <div class="stat-card border-muted">
+                    <div class="stat-num" id="statTotal">–</div>
+                    <div class="stat-label">Total Members</div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="search-wrap">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input class="search-input" id="userSearch" placeholder="Search by name or email…" oninput="filterUsersTable()" />
+                </div>
+                <select class="filter-select" id="roleFilter" onchange="filterUsersTable()">
+                    <option value="">All Roles</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="EMPLOYEE">Employee</option>
+                </select>
+            </div>
+
+            <!-- Users Card Grid -->
+            <div class="user-grid" id="userGrid">
+                <!-- Populated by JS -->
+            </div>
+            <div class="pagination" id="userPagination"></div>
+        </div>
+
+        <!-- ════ CLAIMS TAB ════ -->
+        <div id="tabClaims" style="display:none">
+            <div class="filter-bar">
+                <select class="filter-select" id="claimStatusFilter" onchange="loadAllClaims()">
+                    <option value="">All Statuses</option>
+                    <option value="SUBMITTED">Submitted</option>
+                    <option value="APPROVED">Approved</option>
+                    <option value="REJECTED">Rejected</option>
+                </select>
+            </div>
+            <div class="table-wrap">
+                <table id="allClaimsTable">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Employee</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Comment</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="allClaimsBody">
+                    <tr><td colspan="7" class="empty-cell">Loading claims…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- /content -->
+</main>
+
+<!-- ══════════════════════════════════
+     ADD USER MODAL
+══════════════════════════════════ -->
+<div class="overlay" id="addUserOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Add New User</h2>
+            <button class="modal-close" onclick="closeAddUserModal()">&#x2715;</button>
+        </div>
+        <div class="form-hint">All fields marked * are required.</div>
+
+        <div class="alert alert-error" id="addUserError" style="display:none"></div>
+        <div class="alert alert-success" id="addUserSuccess" style="display:none"></div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Full Name *</label>
+                <input class="form-input" id="newName" placeholder="Jane Doe" />
+                <span class="form-error" id="errNewName">Name must be 2–30 characters.</span>
+            </div>
+            <div class="form-group">
+                <label>Role *</label>
+                <select class="form-input" id="newRole" onchange="toggleManagerField()">
+                    <option value="">Select a role…</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="EMPLOYEE">Employee</option>
+                </select>
+                <span class="form-error" id="errNewRole">Please select a role.</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Work Email *</label>
+            <input class="form-input" id="newEmail" type="email" placeholder="name@company.com" />
+            <span class="form-error" id="errNewEmail">Must end with @company.com.</span>
+        </div>
+
+        <div class="form-group">
+            <label>Password *</label>
+            <input class="form-input" id="newPassword" type="password" placeholder="At least 6 characters" />
+            <span class="form-error" id="errNewPassword">Minimum 6 characters.</span>
+        </div>
+
+        <div class="form-group" id="managerField" style="display:none">
+            <label>Assign Manager <span class="label-optional">(optional)</span></label>
+            <select class="form-input" id="newManager">
+                <option value="">No manager assigned</option>
+            </select>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeAddUserModal()">Cancel</button>
+            <button class="btn btn-primary" id="createUserBtn" onclick="createUser()">
+                <span id="createUserLabel">Create User</span>
+                <span class="spinner" id="createUserSpinner"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── DELETE CONFIRM MODAL ── -->
+<div class="overlay" id="deleteOverlay">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h2 class="modal-title">Remove User</h2>
+            <button class="modal-close" onclick="closeDeleteModal()">&#x2715;</button>
+        </div>
+        <p class="confirm-text">
+            Are you sure you want to remove <strong id="deleteUserName">this user</strong>?
+            This action cannot be undone.
+        </p>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDeleteUser()">
+                <span id="deleteLabel">Yes, Remove</span>
+                <span class="spinner" id="deleteSpinner"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── ADMIN APPROVE MODAL ── -->
+<div class="overlay" id="adminApproveOverlay">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h2 class="modal-title">Approve Claim</h2>
+            <button class="modal-close" onclick="closeAdminApproveModal()">&#x2715;</button>
+        </div>
+        <div class="form-hint">You can add an optional note for the employee.</div>
+        <div class="form-group">
+            <label>Message <span class="label-optional">(optional)</span></label>
+            <textarea class="form-input" id="adminApproveComment" rows="3"
+                      placeholder="e.g. Approved. Please attach receipts next time."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeAdminApproveModal()">Cancel</button>
+            <button class="btn btn-success" id="adminApproveBtn" onclick="confirmAdminApprove()">
+                <span id="adminApproveBtnLabel">Confirm Approval</span>
+                <span class="spinner" id="adminApproveSpinner"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── ADMIN REJECT MODAL ── -->
+<div class="overlay" id="adminRejectOverlay">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h2 class="modal-title">Reject Claim</h2>
+            <button class="modal-close" onclick="closeAdminRejectModal()">&#x2715;</button>
+        </div>
+        <div class="form-group">
+            <label>Reason for Rejection *</label>
+            <textarea class="form-input" id="adminRejectComment" rows="3"
+                      placeholder="Explain why this claim is being rejected…"></textarea>
+            <span class="form-error" id="errAdminRejectComment">A comment is required to reject.</span>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeAdminRejectModal()">Cancel</button>
+            <button class="btn btn-danger" id="adminRejectBtn" onclick="confirmAdminReject()">
+                <span id="adminRejectBtnLabel">Reject Claim</span>
+                <span class="spinner" id="adminRejectSpinner"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Scripts — load in order -->
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
+
