@@ -49,6 +49,31 @@ async function apiFetch(path, options = {}) {
     return (json && json.hasOwnProperty('data')) ? json.data : json;
 }
 
+/**
+ * API handler for public endpoints that do not require Basic Auth.
+ */
+async function publicApiFetch(path, options = {}) {
+    const res = await fetch(API_BASE + path, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(options.headers || {}),
+        },
+    });
+
+    if (!res.ok) {
+        let msg = `Request failed (${res.status})`;
+        try {
+            const errBody = await res.json();
+            msg = errBody.message || msg;
+        } catch (_) {}
+        throw new Error(msg);
+    }
+
+    const json = await res.json();
+    return (json && json.hasOwnProperty('data')) ? json.data : json;
+}
+
 
 // USER API METHODS
 
@@ -67,6 +92,13 @@ async function getUserById(id) {
 }
 
 /**
+ * Fetch the currently authenticated user.
+ */
+async function getCurrentUserApi() {
+    return apiFetch('/auth/me');
+}
+
+/**
  * Create a new user
  */
 async function createUserApi(payload) {
@@ -77,10 +109,45 @@ async function createUserApi(payload) {
 }
 
 /**
+ * Public signup for creating an account from the login screen.
+ */
+async function signupUserApi(payload) {
+    const options = {
+        method: 'POST',
+        body:   JSON.stringify(payload),
+    };
+
+    try {
+        return await publicApiFetch('/auth/signup', options);
+    } catch (err) {
+        // Older running backend builds may not have /auth/signup until restarted.
+        if (String(err.message || '').includes('No static resource')) {
+            return publicApiFetch('/users', options);
+        }
+        throw err;
+    }
+}
+
+/**
  * Delete a user by ID
  */
 async function deleteUserApi(id) {
     return apiFetch(`/users/${id}`, { method: 'DELETE' });
+}
+
+/**
+ * Assign or clear manager for an employee.
+ */
+async function assignManagerApi(employeeId, managerId) {
+    const query = managerId ? `?managerId=${encodeURIComponent(managerId)}` : '';
+    try {
+        return await apiFetch(`/users/${employeeId}/manager${query}`, { method: 'PUT' });
+    } catch (err) {
+        if (String(err.message || '').includes('No static resource')) {
+            throw new Error('Backend is still running an older build. Restart Spring Boot and try again.');
+        }
+        throw err;
+    }
 }
 
 /**

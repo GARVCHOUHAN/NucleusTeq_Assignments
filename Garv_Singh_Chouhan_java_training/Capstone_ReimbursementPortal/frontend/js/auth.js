@@ -3,15 +3,14 @@ const BASE_URL = 'http://localhost:8080/api';
 
 /**
  * Authenticates user using Basic Authentication.
- * Fetches all users and validates the provided email against response.
- * Note: Password is validated by backend via Authorization header.
+ * Password validation is handled by the backend through Spring Security.
  */
 async function loginUser(email, password) {
     // Encode credentials in Base64 format (Basic Auth)
     const token = 'Basic ' + btoa(email + ':' + password);
 
     // Send request with Authorization header
-    const res = await fetch(`${BASE_URL}/users`, {
+    const res = await fetch(`${BASE_URL}/auth/me`, {
         headers: { 'Authorization': token }
     });
 
@@ -27,19 +26,11 @@ async function loginUser(email, password) {
 
     const json = await res.json();
 
-    // Extract actual data from StandardAPIResponse wrapper
-    const users = (json && json.hasOwnProperty('data')) ? json.data : json;
+    const user = (json && json.hasOwnProperty('data')) ? json.data : json;
 
     // Validate response structure
-    if (!Array.isArray(users)) {
+    if (!user || !user.email) {
         throw new Error('Unexpected response from server.');
-    }
-
-    // Find matching user by email (case-insensitive)
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-    if (!user) {
-        throw new Error('No account found with that email.');
     }
 
     return user;
@@ -47,11 +38,10 @@ async function loginUser(email, password) {
 
 /**
  * Stores authenticated session details in localStorage
- * Includes email, password, token, and full user object
+ * Includes email, token, and full user object
  */
 function saveSession(email, password, user) {
     localStorage.setItem('rh_email',    email);
-    localStorage.setItem('rh_password', password);
     localStorage.setItem('rh_token',    btoa(email + ':' + password));
     localStorage.setItem('rh_user',     JSON.stringify(user));
 }
@@ -131,7 +121,6 @@ function populateSidebar() {
  */
 function logout() {
     localStorage.removeItem('rh_email');
-    localStorage.removeItem('rh_password');
     localStorage.removeItem('rh_token');
     localStorage.removeItem('rh_user');
     window.location.href = 'index.html';
