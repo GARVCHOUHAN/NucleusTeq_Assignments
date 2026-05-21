@@ -239,6 +239,33 @@
 </div>
 
 <!-- ── ADMIN APPROVE MODAL ── -->
+<div class="overlay" id="assignManagerOverlay">
+    <div class="modal modal-sm">
+        <div class="modal-header">
+            <h2 class="modal-title">Assign Manager</h2>
+            <button class="modal-close" onclick="closeAssignManagerModal()">&#x2715;</button>
+        </div>
+        <div class="form-hint">
+            Choose a manager for <strong id="assignEmployeeName">this employee</strong>.
+            Select Admin fallback to clear the manager.
+        </div>
+        <div class="alert alert-error" id="assignManagerError" style="display:none"></div>
+        <div class="form-group">
+            <label>Manager</label>
+            <select class="form-input" id="assignManagerSelect">
+                <option value="">Admin fallback</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeAssignManagerModal()">Cancel</button>
+            <button class="btn btn-primary" id="assignManagerBtn" onclick="confirmAssignManager()">
+                <span id="assignManagerLabel">Save Manager</span>
+                <span class="spinner" id="assignManagerSpinner"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="overlay" id="adminApproveOverlay">
     <div class="modal modal-sm">
         <div class="modal-header">
