@@ -2,26 +2,54 @@ package com.reimbursement.reimbursementportal.repository;
 
 import com.reimbursement.reimbursementportal.entity.Claim;
 import com.reimbursement.reimbursementportal.enums.ClaimStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
- * Data access layer for Claim entities.
+ * Repository for Claim entity.
  */
-@Repository
 public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
-    Page<Claim> findByEmployeeId(Long employeeId, Pageable pageable);
+    /**
+     * Finds claims by employee ID.
+     *
+     * @param employeeId the employee ID
+     * @return list of claims
+     */
+    List<Claim> findByEmployeeId(Long employeeId);
 
-    Page<Claim> findByReviewerId(Long reviewerId, Pageable pageable);
+    /**
+     * Finds claims by employee ID and status.
+     *
+     * @param employeeId the employee ID
+     * @param status the claim status
+     * @return list of claims
+     */
+    List<Claim> findByEmployeeIdAndStatus(Long employeeId, ClaimStatus status);
 
-    Page<Claim> findByReviewerIdAndStatus(Long reviewerId, ClaimStatus status, Pageable pageable);
+    /**
+     * Finds claims by reviewer ID.
+     *
+     * @param reviewerId the reviewer ID
+     * @return list of claims
+     */
+    List<Claim> findByReviewerId(Long reviewerId);
 
-    Page<Claim> findAll(Pageable pageable);
+    /**
+     * Finds claims by status.
+     *
+     * @param status the claim status
+     * @return list of claims
+     */
+    List<Claim> findByStatus(ClaimStatus status);
 
-    long countByEmployeeId(Long employeeId);
-
-    long countByReviewerIdAndStatus(Long reviewerId, ClaimStatus status);
+    /**
+     * Finds claims by reviewer ID and status.
+     *
+     * @param reviewerId the reviewer ID
+     * @param status the claim status
+     * @return list of claims
+     */
+    List<Claim> findByReviewerIdAndStatus(Long reviewerId, ClaimStatus status);
 }

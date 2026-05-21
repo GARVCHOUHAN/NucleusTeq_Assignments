@@ -16,6 +16,9 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
+
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +37,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Claim {
 
     @Id
@@ -70,4 +74,20 @@ public class Claim {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public void setDate(LocalDate now) {
+        this.claimDate = now;
+    }
+
+    public void setComment(@Size(max = 500, message = "Comment must not exceed 500 characters") String comment) {
+        
+    }
+
+    public LocalDate getDate() {
+        return this.claimDate;
+    }
+
+    public String getComment() {
+        return this.reviewerComment;
+    }
 }

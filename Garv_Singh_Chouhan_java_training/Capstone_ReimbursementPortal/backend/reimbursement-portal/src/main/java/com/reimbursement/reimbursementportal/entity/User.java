@@ -34,31 +34,39 @@ import org.hibernate.annotations.CreationTimestamp;
 @AllArgsConstructor
 public class User {
 
+    /**
+     * User ID.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    /**
+     * User name.
+     */
     private String name;
 
-    @Column(nullable = false, unique = true)
+    /**
+     * User email.
+     */
+    @Column(unique = true)
     private String email;
 
-    @Column(nullable = false)
+    /**
+     * User password.
+     */
     private String password;
 
+    /**
+     * User role.
+     */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Role role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    /**
+     * Manager of the user.
+     */
+    @ManyToOne
     @JoinColumn(name = "manager_id")
     private User manager;
-
-    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
-    private List<Claim> claims;
-
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
 }
