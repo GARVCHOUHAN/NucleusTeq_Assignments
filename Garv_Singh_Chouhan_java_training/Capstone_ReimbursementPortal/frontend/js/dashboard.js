@@ -11,6 +11,7 @@ let managers       = [];
 let filteredUsers  = [];
 let currentPage    = 1;
 let deleteTargetId = null;
+let assignTargetId = null;
 
 window.addEventListener('DOMContentLoaded', function () {
     guardPage('ADMIN');
@@ -154,7 +155,12 @@ function renderUserCards() {
         <!-- Footer: ID + remove -->
         <div class="user-card-footer">
           <span class="user-id">ID #${u.id}</span>
-          <button class="btn-remove" onclick="openDeleteModal(${u.id}, '${esc(u.name)}')">Remove</button>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${u.role === 'EMPLOYEE'
+              ? `<button class="btn-remove" onclick="openAssignManagerModal(${u.id})">Assign Manager</button>`
+              : ''}
+            <button class="btn-remove" onclick="openDeleteModal(${u.id})">Remove</button>
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -215,7 +221,7 @@ function toggleManagerField() {
 function buildManagerDropdown() {
     const sel = document.getElementById('newManager');
     if (!sel) return;
-    sel.innerHTML = '<option value="">Admin Access</option>';
+    sel.innerHTML = '<option value="">Admin fallback</option>';
     managers.forEach(m => {
         const opt = document.createElement('option');
         opt.value = m.id;
@@ -285,7 +291,66 @@ function clearAddUserForm() {
 /* ════════════════════════════════════════════════════
    DELETE USER — fixed to show friendly errors in modal
    ════════════════════════════════════════════════════ */
-function openDeleteModal(id, name) {
+/* Assign manager for existing employee */
+function openAssignManagerModal(employeeId) {
+    const employee = allUsers.find(u => u.id === employeeId);
+    if (!employee || employee.role !== 'EMPLOYEE') {
+        showToast('Manager can be assigned only to employees.', 'error');
+        return;
+    }
+
+    assignTargetId = employeeId;
+    setText('assignEmployeeName', employee.name);
+    hide('assignManagerError');
+    buildAssignManagerDropdown(employee.managerId);
+    document.getElementById('assignManagerOverlay').classList.add('open');
+}
+
+function closeAssignManagerModal() {
+    assignTargetId = null;
+    hide('assignManagerError');
+    document.getElementById('assignManagerOverlay').classList.remove('open');
+}
+
+function buildAssignManagerDropdown(selectedManagerId) {
+    const sel = document.getElementById('assignManagerSelect');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Admin fallback</option>';
+    managers.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.name;
+        if (selectedManagerId && Number(selectedManagerId) === Number(m.id)) {
+            opt.selected = true;
+        }
+        sel.appendChild(opt);
+    });
+}
+
+async function confirmAssignManager() {
+    if (!assignTargetId) return;
+    const managerId = document.getElementById('assignManagerSelect').value;
+    setButtonLoading('assignManagerBtn', 'assignManagerSpinner', true);
+    hide('assignManagerError');
+
+    try {
+        const updated = await assignManagerApi(assignTargetId, managerId || null);
+        allUsers = allUsers.map(u => u.id === updated.id ? updated : u);
+        managers = allUsers.filter(u => u.role === 'MANAGER');
+        buildManagerDropdown();
+        filterUsersTable();
+        closeAssignManagerModal();
+        showToast(managerId ? 'Manager assigned successfully.' : 'Manager cleared. Admin will review new claims.', 'success');
+    } catch (err) {
+        const box = document.getElementById('assignManagerError');
+        box.textContent = err.message || 'Could not assign manager.';
+        box.style.display = 'block';
+    } finally {
+        setButtonLoading('assignManagerBtn', 'assignManagerSpinner', false);
+    }
+}
+
+function openDeleteModal(id) {
     // Block deleting an ADMIN — find the user in allUsers
     const target = allUsers.find(u => u.id === id);
     if (target && target.role === 'ADMIN') {
@@ -293,7 +358,7 @@ function openDeleteModal(id, name) {
         return;
     }
     deleteTargetId = id;
-    document.getElementById('deleteUserName').textContent = name;
+    document.getElementById('deleteUserName').textContent = target ? target.name : 'this user';
     hideDeleteError();
     document.getElementById('deleteOverlay').classList.add('open');
 }
@@ -405,6 +470,7 @@ let adminActionClaimId = null;
 async function loadAllClaims() {
     const tbody  = document.getElementById('allClaimsBody');
     const status = document.getElementById('claimStatusFilter').value;
+    const admin  = getSession();
     tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">Loading…</td></tr>';
     try {
         const claims = status ? await getClaimsByStatus(status) : await getAllClaims();
@@ -412,7 +478,12 @@ async function loadAllClaims() {
             tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">No claims found.</td></tr>';
             return;
         }
-        tbody.innerHTML = claims.map(c => `
+        tbody.innerHTML = claims.map(c => {
+            const canAdminAct = c.status === 'SUBMITTED' &&
+                admin && Number(c.reviewerId) === Number(admin.id);
+            const actionText = c.status === 'SUBMITTED' ? 'Assigned to manager' : 'NA';
+
+            return `
       <tr>
         <td>#${c.id}</td>
         <td>${esc(c.employeeName || c.employeeId || '–')}</td>
@@ -421,16 +492,17 @@ async function loadAllClaims() {
         <td><span class="status-badge status-${c.status}">${esc(c.status)}</span></td>
         <td>${c.comment ? esc(c.comment) : '<span style="color:var(--text-muted)">NA</span>'}</td>
         <td>
-          ${c.status === 'SUBMITTED'
+          ${canAdminAct
             ? `<div style="display:flex;gap:6px">
                 <button class="btn btn-success btn-sm"
                   onclick="openAdminApproveModal(${c.id})">Approve</button>
                 <button class="btn btn-danger btn-sm"
                   onclick="openAdminRejectModal(${c.id})">Reject</button>
                </div>`
-            : '<span style="color:var(--text-muted);font-size:12px">NA</span>'}
+            : `<span style="color:var(--text-muted);font-size:12px">${esc(actionText)}</span>`}
         </td>
-      </tr>`).join('');
+      </tr>`;
+        }).join('');
     } catch (err) {
         tbody.innerHTML = `<tr><td colspan="7" class="empty-cell">Error: ${esc(err.message)}</td></tr>`;
     }

@@ -13,7 +13,7 @@ async function refreshCurrentUser() {
     const user = getSession();
     if (!user) return;
     try {
-        const fresh = await getUserById(user.id);
+        const fresh = await getCurrentUserApi();
         // Merge fresh data back into session (keeps token/email/password intact)
         const updated = Object.assign({}, user, fresh);
         localStorage.setItem('rh_user', JSON.stringify(updated));
