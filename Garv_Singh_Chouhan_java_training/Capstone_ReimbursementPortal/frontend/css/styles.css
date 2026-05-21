@@ -209,6 +209,13 @@ body{
 
 }
 
+.signup-container{
+
+    width:100%;
+    max-width:520px;
+
+}
+
 .login-header{
 
     text-align:center;
@@ -354,6 +361,52 @@ body{
     text-align:center;
     color:#cbd5e1;
     font-size:13px;
+
+}
+
+.auth-switch{
+
+    margin-top:22px;
+    text-align:center;
+    color:#d1d5db;
+    font-size:14px;
+
+}
+
+.auth-switch a{
+
+    color:#ffffff;
+    font-weight:700;
+    text-decoration:none;
+
+}
+
+.auth-switch a:hover{
+
+    text-decoration:underline;
+
+}
+
+.form-error{
+
+    display:none;
+    margin-top:8px;
+    color:#fecaca;
+    font-size:13px;
+    font-weight:600;
+
+}
+
+.form-error.show{
+
+    display:block;
+
+}
+
+.modal .form-group label,
+.form-card .form-group label{
+
+    color:var(--text);
 
 }
 
@@ -886,6 +939,12 @@ tbody tr:hover{
     justify-content:center;
 
     z-index:999;
+
+}
+
+.overlay.open{
+
+    display:flex;
 
 }
 

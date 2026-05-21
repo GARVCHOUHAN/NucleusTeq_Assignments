@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReimburseHub - Sign Up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="login-page">
+
+<div class="login-container signup-container">
+
+    <div class="login-header">
+        <div class="login-logo">Reimburse<span>Hub</span></div>
+        <p class="login-subtitle">Create your reimbursement portal account</p>
+    </div>
+
+    <div class="alert alert-error" id="signupError" style="display:none"></div>
+    <div class="alert alert-success" id="signupSuccess" style="display:none"></div>
+
+    <form id="signupForm" autocomplete="off">
+
+        <div class="form-group">
+            <label for="signupName">Full Name</label>
+            <input class="form-input" type="text" id="signupName" placeholder="Jane Doe" required />
+            <span class="form-error" id="errSignupName">Name must be 2-30 characters.</span>
+        </div>
+
+        <div class="form-group">
+            <label for="signupEmail">Work Email</label>
+            <input class="form-input" type="email" id="signupEmail" placeholder="name@company.com" required />
+            <span class="form-error" id="errSignupEmail">Use a valid @company.com email.</span>
+        </div>
+
+        <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input class="form-input" type="password" id="signupPassword" placeholder="At least 6 characters" required />
+            <span class="form-error" id="errSignupPassword">Password must be at least 6 characters.</span>
+        </div>
+
+        <div class="form-group">
+            <label for="signupRole">Role</label>
+            <select class="form-input" id="signupRole" required>
+                <option value="">Select a role...</option>
+                <option value="EMPLOYEE">Employee</option>
+                <option value="MANAGER">Manager</option>
+                <option value="ADMIN">Admin</option>
+            </select>
+            <span class="form-error" id="errSignupRole">Please select a role.</span>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit" id="signupBtn">
+            <span id="signupBtnLabel">Create Account</span>
+            <span class="spinner" id="signupSpinner"></span>
+        </button>
+
+    </form>
+
+    <p class="auth-switch">
+        Already have an account?
+        <a href="index.html">Sign in</a>
+    </p>
+
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/signup.js"></script>
+
+</body>
+</html>
