@@ -1,28 +1,59 @@
 package com.reimbursement.reimbursementportal.service;
 
-import com.reimbursement.reimbursementportal.entity.User;
-import com.reimbursement.reimbursementportal.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import com.reimbursement.reimbursementportal.dto.request.UserRequestDTO;
+import com.reimbursement.reimbursementportal.dto.response.UserResponseDTO;
 
-@Service
-public class UserService {
+import java.util.List;
 
-    @Autowired
-    private UserRepository userRepository;
+/**
+ * Service interface for user operations.
+ */
+public interface UserService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    /**
+     * Creates a new user.
+     *
+     * @param request the user request
+     * @return the created user
+     */
+    UserResponseDTO createUser(UserRequestDTO request);
 
-    public User registerUser(User user) {
+    /**
+     * Retrieves all users.
+     *
+     * @return list of users
+     */
+    List<UserResponseDTO> getAllUsers();
 
-        if (!user.getEmail().endsWith("@company.com")) {
-            throw new RuntimeException("Invalid company email");
-        }
+    /**
+     * Retrieves a user by ID.
+     *
+     * @param id the user ID
+     * @return the user
+     */
+    UserResponseDTO getUserById(Long id);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    /**
+     * Assigns or clears a manager for an employee.
+     *
+     * @param employeeId the employee user ID
+     * @param managerId the manager user ID, or null to route claims to admin
+     * @return the updated employee
+     */
+    UserResponseDTO assignManager(Long employeeId, Long managerId);
 
-        return userRepository.save(user);
-    }
+    /**
+     * Retrieves employees by manager ID.
+     *
+     * @param managerId the manager ID
+     * @return list of employees
+     */
+    List<UserResponseDTO> getEmployeesByManager(Long managerId);
+
+    /**
+     * Deletes a user by ID.
+     *
+     * @param id the user ID
+     */
+    void deleteUser(Long id);
 }
