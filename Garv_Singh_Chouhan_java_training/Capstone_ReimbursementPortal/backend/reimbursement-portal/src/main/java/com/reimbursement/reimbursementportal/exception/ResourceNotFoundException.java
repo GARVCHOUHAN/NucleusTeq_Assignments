@@ -2,13 +2,16 @@ package com.reimbursement.reimbursementportal.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 /**
- * Thrown when a requested resource is not found.
+ * Exception for resource not found.
  */
-@ResponseStatus(HttpStatus.NOT_FOUND)
 public class ResourceNotFoundException extends RuntimeException {
 
+    /**
+     * Constructs a new ResourceNotFoundException.
+     *
+     * @param message the error message
+     */
     public ResourceNotFoundException(String message) {
         super(message);
     }
