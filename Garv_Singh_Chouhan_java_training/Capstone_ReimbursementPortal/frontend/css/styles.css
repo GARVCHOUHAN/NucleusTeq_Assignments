@@ -1939,3 +1939,55 @@ td{
         justify-self:start;
     }
 }
+
+
+/* ==========================================
+   Search + Role filter spacing improvement
+   ========================================== */
+
+.filter-bar{
+    display:flex;
+    align-items:center;
+    gap:24px;              /* horizontal space between search & roles */
+    margin-top:18px;       /* space from stat cards above */
+    margin-bottom:22px;    /* space from user cards below */
+}
+
+/* Search input area */
+.search-wrap{
+    flex:1;
+    max-width:650px;
+}
+
+/* All roles dropdown */
+.filter-select{
+    min-width:220px;
+    margin-left:10px;
+}
+
+
+/* ==========================================
+   Reduce Users & All Claims button size
+   ========================================== */
+
+.nav-link{
+    padding:10px 14px;     /* reduced from 11px 12px */
+    min-height:60px;       /* smaller height */
+}
+
+.nav-link img,
+.nav-link svg{
+    width:50px;
+    height:50px;
+}
+
+/* Badge count (22) smaller */
+.nav-badge{
+    padding:3px 7px;
+    font-size:10px;
+}
+
+/* Optional: slightly reduce icon section */
+.sidebar .nav-link{
+    font-size:15px;
+}
