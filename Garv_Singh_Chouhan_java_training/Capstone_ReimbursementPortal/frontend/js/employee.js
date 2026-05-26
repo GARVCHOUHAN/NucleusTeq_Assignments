@@ -6,6 +6,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     // made after login are immediately visible without re-logging in
     await refreshCurrentUser();
     showManagerBanner();
+    setDefaultClaimDate();
 });
 
 /* Re-fetch logged-in user from API and update localStorage */
@@ -62,4 +63,9 @@ function setupEmployeeTabs() {
             if (tab === 'history') loadEmployeeClaims();
         });
     });
+}
+
+function setDefaultClaimDate() {
+    const claimDate = document.getElementById('claimDate');
+    if (claimDate) claimDate.value = todayIsoDate();
 }

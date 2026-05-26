@@ -1,6 +1,7 @@
 package com.reimbursement.reimbursementportal.dto.response;
 
 import com.reimbursement.reimbursementportal.enums.ClaimStatus;
+import com.reimbursement.reimbursementportal.enums.Role;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,7 @@ public class ClaimResponseDTO {
 
     private Long reviewerId;
     private String reviewerName;
+    private Role reviewerRole;
 
     private String comment;
 }

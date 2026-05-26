@@ -70,9 +70,15 @@
 
                 <div class="form-group">
                     <label>Amount (₹) *</label>
-                    <input class="form-input" id="claimAmount" type="number" min="1"
+                    <input class="form-input" id="claimAmount" type="number" min="1" max="100000"
                            placeholder="e.g. 2500" />
-                    <span class="form-error" id="errAmount">Please enter a valid amount greater than 0.</span>
+                    <span class="form-error" id="errAmount">Please enter an amount from 1 to 100000.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Claim Date *</label>
+                    <input class="form-input" id="claimDate" type="date" />
+                    <span class="form-error" id="errClaimDate">Please select a valid claim date.</span>
                 </div>
 
                 <div class="form-group">
@@ -103,8 +109,8 @@
                 <table>
                     <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Amount</th>
+                        <th>Date</th>
                         <th>Description</th>
                         <th>Status</th>
                         <th>Comment</th>
@@ -115,6 +121,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="pagination" id="employeeClaimsPagination"></div>
         </div>
 
     </div>

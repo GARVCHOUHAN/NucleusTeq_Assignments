@@ -13,12 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -80,7 +78,7 @@ public class Claim {
     }
 
     public void setComment(@Size(max = 500, message = "Comment must not exceed 500 characters") String comment) {
-        
+        this.reviewerComment = (comment == null || comment.isBlank()) ? null : comment.trim();
     }
 
     public LocalDate getDate() {

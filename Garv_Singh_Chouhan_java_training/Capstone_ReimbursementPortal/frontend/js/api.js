@@ -74,6 +74,18 @@ async function publicApiFetch(path, options = {}) {
     return (json && json.hasOwnProperty('data')) ? json.data : json;
 }
 
+function toQuery(params = {}) {
+    const query = Object.entries(params)
+        .filter(([, value]) => value !== undefined && value !== null && value !== '')
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&');
+    return query ? `?${query}` : '';
+}
+
+function pageContent(payload) {
+    return Array.isArray(payload) ? payload : (payload && payload.content) || [];
+}
+
 
 // USER API METHODS
 
@@ -164,29 +176,29 @@ async function getUsersByManager(managerId) {
 /**
  * Fetch all reimbursement claims
  */
-async function getAllClaims() {
-    return apiFetch('/claims');
+async function getAllClaims(params = {}) {
+    return apiFetch('/claims' + toQuery(params));
 }
 
 /**
  * Fetch claims submitted by a specific employee
  */
-async function getClaimsByEmployee(employeeId) {
-    return apiFetch(`/claims/employee/${employeeId}`);
+async function getClaimsByEmployee(employeeId, params = {}) {
+    return apiFetch(`/claims/employee/${employeeId}` + toQuery(params));
 }
 
 /**
  * Fetch claims assigned to a reviewer/manager
  */
-async function getClaimsByReviewer(reviewerId) {
-    return apiFetch(`/claims/reviewer/${reviewerId}`);
+async function getClaimsByReviewer(reviewerId, params = {}) {
+    return apiFetch(`/claims/reviewer/${reviewerId}` + toQuery(params));
 }
 
 /**
  * Fetch claims filtered by status
  */
-async function getClaimsByStatus(status) {
-    return apiFetch(`/claims/status/${status}`);
+async function getClaimsByStatus(status, params = {}) {
+    return apiFetch(`/claims/status/${status}` + toQuery(params));
 }
 
 /**
@@ -269,6 +281,15 @@ const AVATAR_COLORS = [
 function avatarColor(name) {
     const idx = String(name).charCodeAt(0) % AVATAR_COLORS.length;
     return AVATAR_COLORS[idx];
+}
+
+function formatDate(value) {
+    if (!value) return 'NA';
+    return new Date(value + 'T00:00:00').toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+    });
 }
 
 /**

@@ -2,6 +2,7 @@ package com.reimbursement.reimbursementportal.service.serviceImpl;
 import com.reimbursement.reimbursementportal.dto.request.ClaimActionRequestDTO;
 import com.reimbursement.reimbursementportal.dto.request.ClaimRequestDTO;
 import com.reimbursement.reimbursementportal.dto.response.ClaimResponseDTO;
+import com.reimbursement.reimbursementportal.dto.response.PageResponseDTO;
 import com.reimbursement.reimbursementportal.entity.Claim;
 import com.reimbursement.reimbursementportal.entity.User;
 import com.reimbursement.reimbursementportal.enums.ClaimStatus;
@@ -16,11 +17,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,8 @@ public class ClaimServiceImpl implements ClaimService {
     private final ClaimRepository claimRepository;
     private final UserRepository userRepository;
     private static final Logger log = LoggerFactory.getLogger(ClaimServiceImpl.class);
+    private static final BigDecimal MAX_CLAIM_AMOUNT = BigDecimal.valueOf(100000);
+    private static final int MAX_PAGE_SIZE = 100;
 
     // ========================= SUBMIT CLAIM =========================
     @Override
@@ -36,6 +41,15 @@ public class ClaimServiceImpl implements ClaimService {
 
         if (request.getAmount() == null || request.getAmount() <= 0) {
             throw new BadRequestException("Amount must be greater than 0");
+        }
+
+        BigDecimal amount = BigDecimal.valueOf(request.getAmount());
+        if (amount.compareTo(MAX_CLAIM_AMOUNT) > 0) {
+            throw new BadRequestException("Amount must not exceed 100000");
+        }
+
+        if (request.getClaimDate() == null) {
+            throw new BadRequestException("Claim date is required");
         }
 
         if (request.getDescription() == null || request.getDescription().isBlank()) {
@@ -50,9 +64,9 @@ public class ClaimServiceImpl implements ClaimService {
         User reviewer = resolveReviewer(employee);
 
         Claim claim = new Claim();
-        claim.setAmount(BigDecimal.valueOf(request.getAmount()));
+        claim.setAmount(amount);
         claim.setDescription(request.getDescription());
-        claim.setDate(LocalDate.now());
+        claim.setDate(request.getClaimDate());
         claim.setStatus(ClaimStatus.SUBMITTED);
         claim.setEmployee(employee);
         claim.setReviewer(reviewer);
@@ -64,48 +78,36 @@ public class ClaimServiceImpl implements ClaimService {
 
     // ========================= GET ALL CLAIMS =========================
     @Override
-    public List<ClaimResponseDTO> getAllClaims() {
-        return claimRepository.findAll()
-                .stream()
-                .map(ClaimMapper::toResponse)
-                .toList();
+    public PageResponseDTO<ClaimResponseDTO> getAllClaims(int page, int size) {
+        return toPageResponse(claimRepository.findAll(pageable(page, size)));
     }
 
     // ========================= GET CLAIMS BY EMPLOYEE =========================
     @Override
-    public List<ClaimResponseDTO> getClaimsByEmployee(Long employeeId) {
+    public PageResponseDTO<ClaimResponseDTO> getClaimsByEmployee(Long employeeId, int page, int size) {
 
         if (!userRepository.existsById(employeeId)) {
             throw new BadRequestException("Employee not found");
         }
 
-        return claimRepository.findByEmployeeId(employeeId)
-                .stream()
-                .map(ClaimMapper::toResponse)
-                .toList();
+        return toPageResponse(claimRepository.findByEmployeeId(employeeId, pageable(page, size)));
     }
 
     // ========================= GET CLAIMS BY REVIEWER =========================
     @Override
-    public List<ClaimResponseDTO> getClaimsByReviewer(Long reviewerId) {
+    public PageResponseDTO<ClaimResponseDTO> getClaimsByReviewer(Long reviewerId, int page, int size) {
 
         if (!userRepository.existsById(reviewerId)) {
             throw new BadRequestException("Reviewer not found");
         }
 
-        return claimRepository.findByReviewerId(reviewerId)
-                .stream()
-                .map(ClaimMapper::toResponse)
-                .toList();
+        return toPageResponse(claimRepository.findByReviewerId(reviewerId, pageable(page, size)));
     }
 
     // ========================= GET CLAIMS BY STATUS =========================
     @Override
-    public List<ClaimResponseDTO> getClaimsByStatus(ClaimStatus status) {
-        return claimRepository.findByStatus(status)
-                .stream()
-                .map(ClaimMapper::toResponse)
-                .toList();
+    public PageResponseDTO<ClaimResponseDTO> getClaimsByStatus(ClaimStatus status, int page, int size) {
+        return toPageResponse(claimRepository.findByStatus(status, pageable(page, size)));
     }
 
     // ========================= TAKE ACTION =========================
@@ -125,14 +127,15 @@ public class ClaimServiceImpl implements ClaimService {
             throw new BadRequestException("Claim has already been processed");
         }
 
-        // AUTHORIZATION:
-        // Allow action if:
-        //   (a) the acting user is an ADMIN — admin can approve/reject ANY claim, OR
-        //   (b) the acting user is the assigned reviewer on this specific claim
+        // Only the assigned reviewer can approve or reject a claim.
+        // For admin fallback claims, any admin can complete the review.
         boolean isAssignedReviewer = claim.getReviewer() != null &&
                 claim.getReviewer().getId().equals(reviewerId);
+        boolean isAdminFallbackClaim = reviewer.getRole() == Role.ADMIN &&
+                claim.getReviewer() != null &&
+                claim.getReviewer().getRole() == Role.ADMIN;
 
-        if (!isAssignedReviewer) {
+        if (!isAssignedReviewer && !isAdminFallbackClaim) {
             throw new BadRequestException("You are not authorized to take action on this claim");
         }
 
@@ -157,8 +160,7 @@ public class ClaimServiceImpl implements ClaimService {
         }
         claim.setComment(request.getComment());
 
-        // Update reviewer to the person who actually took the action
-        // This correctly records that an Admin actioned it, not the original assigned reviewer
+        // Keep reviewer aligned with the person who completed the assigned review.
         claim.setReviewer(reviewer);
 
 
@@ -179,5 +181,24 @@ public class ClaimServiceImpl implements ClaimService {
                 .findFirst()
                 .orElseThrow(() ->
                         new BadRequestException("No admin available to act as reviewer"));
+    }
+
+    private Pageable pageable(int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+        return PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+    }
+
+    private PageResponseDTO<ClaimResponseDTO> toPageResponse(Page<Claim> claimPage) {
+        Page<ClaimResponseDTO> dtoPage = claimPage.map(ClaimMapper::toResponse);
+        return PageResponseDTO.<ClaimResponseDTO>builder()
+                .content(dtoPage.getContent())
+                .page(dtoPage.getNumber())
+                .size(dtoPage.getSize())
+                .totalElements(dtoPage.getTotalElements())
+                .totalPages(dtoPage.getTotalPages())
+                .first(dtoPage.isFirst())
+                .last(dtoPage.isLast())
+                .build();
     }
 }

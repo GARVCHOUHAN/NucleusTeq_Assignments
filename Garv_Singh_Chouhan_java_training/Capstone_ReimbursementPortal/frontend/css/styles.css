@@ -1477,3 +1477,465 @@ tbody tr:hover{
     }
 
 }
+
+/* Final dashboard polish overrides */
+:root{
+    --radius: 8px;
+    --radius-sm: 8px;
+}
+
+body{
+    font-family:'DM Sans', Arial, sans-serif;
+}
+
+.sidebar{
+    width:260px;
+    padding:24px 18px;
+}
+
+.main{
+    margin-left:260px;
+    padding:28px;
+}
+
+.logo-name{
+    font-size:26px;
+}
+
+.nav{
+    margin-top:32px;
+}
+
+.nav-link{
+    padding:11px 12px;
+    border-radius:8px;
+}
+
+.sidebar-user{
+    padding:14px;
+    border-radius:8px;
+}
+
+.sidebar-avatar{
+    width:40px;
+    height:40px;
+}
+
+.logout-btn{
+    padding:10px 14px;
+    border-radius:8px;
+}
+
+.topbar{
+    margin-bottom:22px;
+}
+
+.topbar-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.page-heading{
+    font-size:30px;
+    letter-spacing:0;
+}
+
+.content{
+    gap:20px;
+}
+
+.form-card,
+.table-card,
+.stat-card{
+    padding:18px;
+    border-radius:8px;
+}
+
+.stat-grid{
+    gap:14px;
+}
+
+.stat-num{
+    font-size:28px;
+}
+
+.stat-label{
+    margin-top:4px;
+    font-size:13px;
+}
+
+.btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:38px;
+    width:auto;
+    padding:10px 14px;
+    border-radius:8px;
+    line-height:1.2;
+    white-space:nowrap;
+}
+
+.btn-block{
+    width:100%;
+}
+
+.btn-sm,
+.btn-remove,
+.page-btn{
+    min-height:30px;
+    padding:7px 10px;
+    border-radius:7px;
+    font-size:12px;
+}
+
+.search-input,
+.filter-select{
+    padding:10px 12px;
+    border-radius:8px;
+}
+
+.filter-bar{
+    gap:12px;
+}
+
+.table-wrap{
+    border:1px solid var(--border);
+    border-radius:8px;
+    box-shadow:0 6px 18px rgba(15,23,42,0.05);
+}
+
+th{
+    padding:12px 14px;
+    letter-spacing:0;
+}
+
+td{
+    padding:13px 14px;
+    vertical-align:top;
+}
+
+.modal{
+    border-radius:10px;
+    padding:24px;
+}
+
+.modal-title{
+    font-size:21px;
+}
+
+.user-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:14px;
+}
+
+.user-card,
+.claim-card,
+.skeleton-card,
+.empty-state{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:8px;
+    box-shadow:0 6px 18px rgba(15,23,42,0.05);
+}
+
+.user-card{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:16px;
+}
+
+.user-card-top{
+    display:grid;
+    grid-template-columns:40px minmax(0,1fr) auto;
+    align-items:center;
+    gap:12px;
+}
+
+.user-avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-weight:700;
+    font-size:13px;
+}
+
+.user-info{
+    min-width:0;
+}
+
+.user-name{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:15px;
+    font-weight:700;
+}
+
+.user-email{
+    margin-top:2px;
+    overflow:hidden;
+    color:var(--text-soft);
+    font-size:12px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.role-pill,
+.status-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:999px;
+    padding:5px 9px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0;
+}
+
+.role-ADMIN,
+.status-APPROVED{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.role-MANAGER,
+.status-SUBMITTED{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.role-EMPLOYEE,
+.status-REJECTED{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.card-meta{
+    min-height:38px;
+    padding:10px 12px;
+    border-radius:8px;
+    background:#f8fafc;
+    color:var(--text-soft);
+    font-size:13px;
+}
+
+.meta-label{
+    color:#64748b;
+    font-weight:600;
+}
+
+.meta-value{
+    color:var(--text);
+}
+
+.user-card-footer,
+.claim-actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+}
+
+.user-card-context{
+    color:#94a3b8;
+    font-size:12px;
+}
+
+.btn-remove{
+    border:1px solid var(--border);
+    background:white;
+    color:#334155;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.btn-remove:hover{
+    border-color:#cbd5e1;
+    background:#f8fafc;
+}
+
+.pagination{
+    display:flex;
+    justify-content:flex-end;
+    gap:6px;
+    margin-top:14px;
+}
+
+.page-btn{
+    border:1px solid var(--border);
+    background:white;
+    color:#334155;
+    cursor:pointer;
+}
+
+.page-btn.active{
+    border-color:var(--primary);
+    background:var(--primary);
+    color:white;
+}
+
+.page-btn:disabled{
+    cursor:not-allowed;
+    opacity:.5;
+}
+
+.claims-grid{
+    grid-template-columns:1fr;
+    gap:14px;
+}
+
+.claim-card{
+    display:grid;
+    grid-template-columns:minmax(150px,.8fr) minmax(0,1.4fr) auto;
+    align-items:center;
+    gap:16px;
+    padding:16px;
+}
+
+.claim-card-header{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.claim-type{
+    color:#64748b;
+    font-size:12px;
+    font-weight:700;
+}
+
+.claim-amount{
+    margin-top:6px;
+    font-size:24px;
+    line-height:1;
+    font-weight:800;
+}
+
+.claim-amount-label{
+    margin-top:5px;
+    color:var(--text-soft);
+    font-size:12px;
+}
+
+.claim-desc{
+    color:#334155;
+    font-size:14px;
+    line-height:1.45;
+    overflow-wrap:anywhere;
+}
+
+.claim-comment{
+    grid-column:1 / -1;
+    padding:10px 12px;
+    border-radius:8px;
+    background:#f8fafc;
+    color:#475569;
+    font-size:13px;
+}
+
+.claim-actions{
+    justify-content:flex-end;
+    padding-top:0;
+    border-top:0;
+}
+
+.empty-state{
+    padding:24px;
+    color:#64748b;
+    text-align:center;
+}
+
+.skeleton-card{
+    padding:16px;
+}
+
+.search-wrap{
+    position:relative;
+    flex:1;
+    max-width:520px;
+}
+
+.search-icon{
+    position:absolute;
+    left:12px;
+    top:50%;
+    width:16px;
+    height:16px;
+    color:#94a3b8;
+    transform:translateY(-50%);
+    pointer-events:none;
+}
+
+.search-wrap .search-input{
+    width:100%;
+    padding-left:38px;
+}
+
+.table-wrap table{
+    table-layout:auto;
+}
+
+.table-wrap td:nth-child(3){
+    max-width:420px;
+}
+
+@media screen and (max-width: 1024px) {
+    .sidebar{
+        width:240px;
+    }
+
+    .main{
+        margin-left:240px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .sidebar{
+        width:100%;
+        border-radius:0;
+    }
+
+    .main{
+        margin-left:0;
+        padding:18px;
+    }
+
+    .topbar-actions{
+        align-items:stretch;
+    }
+
+    .btn{
+        width:100%;
+    }
+
+    .claim-card{
+        grid-template-columns:1fr;
+    }
+
+    .claim-actions{
+        justify-content:flex-start;
+        padding-top:12px;
+        border-top:1px solid var(--border);
+    }
+
+    .user-card-top{
+        grid-template-columns:40px minmax(0,1fr);
+    }
+
+    .role-pill{
+        grid-column:2;
+        justify-self:start;
+    }
+}

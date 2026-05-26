@@ -3,6 +3,8 @@ package com.reimbursement.reimbursementportal.controller;
 import com.reimbursement.reimbursementportal.dto.request.UserRequestDTO;
 import com.reimbursement.reimbursementportal.dto.response.UserResponseDTO;
 import com.reimbursement.reimbursementportal.entity.User;
+import com.reimbursement.reimbursementportal.enums.Role;
+import com.reimbursement.reimbursementportal.exception.BadRequestException;
 import com.reimbursement.reimbursementportal.mapper.UserMapper;
 import com.reimbursement.reimbursementportal.repository.UserRepository;
 import com.reimbursement.reimbursementportal.dto.StandardAPIResponse;
@@ -12,7 +14,11 @@ import org.springframework.http.ResponseEntity;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller for authentication-related endpoints.
@@ -34,6 +40,10 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<StandardAPIResponse<UserResponseDTO>> signup(
             @Valid @RequestBody UserRequestDTO request) {
+
+        if (request.getRole() != Role.EMPLOYEE) {
+            throw new BadRequestException("Public signup is allowed only for employees");
+        }
 
         UserResponseDTO response = userService.createUser(request);
 

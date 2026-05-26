@@ -5,6 +5,9 @@
 
 let rejectTargetClaimId  = null;
 let approveTargetClaimId = null; // for approve-with-message modal
+let managerClaimsPage    = 0;
+let employeeClaimsPage   = 0;
+const CLAIMS_PAGE_SIZE   = 10;
 
 /* =====================================================
    MANAGER — Load and render assigned claims
@@ -18,8 +21,10 @@ async function loadManagerClaims() {
     grid.innerHTML = renderClaimSkeletons();
 
     try {
-        let claims = await getClaimsByReviewer(user.id);
+        const result = await getClaimsByReviewer(user.id, { page: managerClaimsPage, size: CLAIMS_PAGE_SIZE });
+        let claims = pageContent(result);
         if (status) claims = claims.filter(c => c.status === status);
+        renderClaimsPagination('managerClaimsPagination', result, 'goManagerClaimsPage');
 
         const pending = claims.filter(c => c.status === 'SUBMITTED').length;
         const badge = document.getElementById('pendingBadge');
@@ -49,17 +54,14 @@ function renderClaimCard(c, idx, showActions) {
     return `
     <div class="claim-card" style="animation-delay:${delay}s">
       <div class="claim-card-header">
-        <span class="claim-id">ID #${c.id}</span>
+        <span class="claim-type">Reimbursement Request</span>
         <span class="status-badge status-${c.status}">${esc(c.status)}</span>
       </div>
       <div>
         <div class="claim-amount">${formatCurrency(c.amount)}</div>
-        <div class="claim-amount-label">Reimbursement Request</div>
+        <div class="claim-amount-label">${c.employeeName ? 'Submitted by ' + esc(c.employeeName) : 'Employee claim'}</div>
       </div>
       <div class="claim-desc">${esc(c.description)}</div>
-      ${c.employeeName
-        ? `<div class="claim-employee">Submitted by <strong>${esc(c.employeeName)}</strong></div>`
-        : ''}
       ${hasComment
         ? `<div class="claim-comment" style="display:block">Reviewer note: ${esc(c.comment)}</div>`
         : ''}
@@ -159,26 +161,31 @@ async function confirmReject() {
 async function submitClaim() {
     const user   = getSession();
     const amount = document.getElementById('claimAmount').value;
+    const date   = document.getElementById('claimDate').value;
     const desc   = document.getElementById('claimDesc').value.trim();
 
     hideEl('submitError');
     hideEl('submitSuccess');
 
-    const amountOk = amount && parseFloat(amount) > 0;
+    const amountNumber = parseFloat(amount);
+    const amountOk = amount && amountNumber > 0 && amountNumber <= 100000;
+    const dateOk   = date && new Date(date + 'T00:00:00') <= new Date();
     const descOk   = desc.length > 0;
 
     toggleErrEl('errAmount', !amountOk);
+    toggleErrEl('errClaimDate', !dateOk);
     toggleErrEl('errDesc',   !descOk);
-    if (!amountOk || !descOk) return;
+    if (!amountOk || !dateOk || !descOk) return;
 
     setButtonLoading('submitClaimBtn', 'submitSpinner', true);
 
     try {
-        await submitClaimApi({ amount: parseFloat(amount), description: desc, employeeId: user.id });
+        await submitClaimApi({ amount: amountNumber, claimDate: date, description: desc, employeeId: user.id });
         const successEl = document.getElementById('submitSuccess');
         successEl.textContent   = 'Your claim has been submitted successfully.';
         successEl.style.display = 'block';
         document.getElementById('claimAmount').value = '';
+        document.getElementById('claimDate').value   = todayIsoDate();
         document.getElementById('claimDesc').value   = '';
         showToast('Claim submitted!', 'success');
     } catch (err) {
@@ -202,8 +209,10 @@ async function loadEmployeeClaims() {
     tbody.innerHTML = '<tr><td colspan="5" class="empty-cell">Loading…</td></tr>';
 
     try {
-        let claims = await getClaimsByEmployee(user.id);
+        const result = await getClaimsByEmployee(user.id, { page: employeeClaimsPage, size: CLAIMS_PAGE_SIZE });
+        let claims = pageContent(result);
         if (status) claims = claims.filter(c => c.status === status);
+        renderClaimsPagination('employeeClaimsPagination', result, 'goEmployeeClaimsPage');
 
         const badge = document.getElementById('claimCountBadge');
         if (badge) badge.textContent = claims.length || '0';
@@ -215,8 +224,8 @@ async function loadEmployeeClaims() {
 
         tbody.innerHTML = claims.map(c => `
       <tr>
-        <td>#${c.id}</td>
         <td><strong>${formatCurrency(c.amount)}</strong></td>
+        <td>${formatDate(c.date)}</td>
         <td>${esc(c.description)}</td>
         <td><span class="status-badge status-${c.status}">${esc(c.status)}</span></td>
         <td>${c.comment
@@ -254,6 +263,38 @@ function renderClaimSkeletons() {
 }
 
 /* ── Helpers ── */
+function renderClaimsPagination(containerId, pageData, handlerName) {
+    const container = document.getElementById(containerId);
+    if (!container || !pageData || Array.isArray(pageData)) return;
+
+    const pages = pageData.totalPages || 0;
+    if (pages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = `<button class="page-btn" onclick="${handlerName}(${pageData.page - 1})" ${pageData.first ? 'disabled' : ''}>&#8249;</button>`;
+    for (let i = 0; i < pages; i++) {
+        html += `<button class="page-btn ${i === pageData.page ? 'active' : ''}" onclick="${handlerName}(${i})">${i + 1}</button>`;
+    }
+    html += `<button class="page-btn" onclick="${handlerName}(${pageData.page + 1})" ${pageData.last ? 'disabled' : ''}>&#8250;</button>`;
+    container.innerHTML = html;
+}
+
+function goManagerClaimsPage(page) {
+    managerClaimsPage = Math.max(page, 0);
+    loadManagerClaims();
+}
+
+function goEmployeeClaimsPage(page) {
+    employeeClaimsPage = Math.max(page, 0);
+    loadEmployeeClaims();
+}
+
+function todayIsoDate() {
+    return new Date().toISOString().slice(0, 10);
+}
+
 function hideEl(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 function toggleErrEl(id, show) { const el = document.getElementById(id); if (el) el.classList.toggle('show', show); }
 

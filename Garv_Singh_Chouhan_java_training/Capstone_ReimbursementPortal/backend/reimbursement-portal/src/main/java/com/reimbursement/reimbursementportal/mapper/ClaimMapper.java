@@ -8,7 +8,6 @@ import com.reimbursement.reimbursementportal.entity.User;
 import com.reimbursement.reimbursementportal.enums.ClaimStatus;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 /**
  * Mapper for Claim entity.
@@ -33,6 +32,7 @@ public class ClaimMapper {
                 .employeeName(claim.getEmployee() != null ? claim.getEmployee().getName() : null)
                 .reviewerId(claim.getReviewer() != null ? claim.getReviewer().getId() : null)
                 .reviewerName(claim.getReviewer() != null ? claim.getReviewer().getName() : null)
+                .reviewerRole(claim.getReviewer() != null ? claim.getReviewer().getRole() : null)
                 .comment(claim.getComment())
                 .build();
     }
@@ -50,7 +50,7 @@ public class ClaimMapper {
         Claim claim = new Claim();
         claim.setAmount(BigDecimal.valueOf(request.getAmount()));
         claim.setDescription(request.getDescription());
-        claim.setDate(LocalDate.now());
+        claim.setDate(request.getClaimDate());
         claim.setStatus(ClaimStatus.SUBMITTED);
         claim.setEmployee(employee);
         claim.setReviewer(reviewer);

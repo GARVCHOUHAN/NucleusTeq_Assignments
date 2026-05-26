@@ -1,15 +1,12 @@
 package com.reimbursement.reimbursementportal.service;
-import com.reimbursement.reimbursementportal.dto.*;
-
 import com.reimbursement.reimbursementportal.dto.request.ClaimActionRequestDTO;
 
 import com.reimbursement.reimbursementportal.dto.request.ClaimRequestDTO;
 
 import com.reimbursement.reimbursementportal.dto.response.ClaimResponseDTO;
+import com.reimbursement.reimbursementportal.dto.response.PageResponseDTO;
 
 import com.reimbursement.reimbursementportal.enums.ClaimStatus;
-
-import java.util.List;
 
 /**
  * Service interface for claim operations.
@@ -29,7 +26,7 @@ public interface ClaimService {
      *
      * @return list of claims
      */
-    List<ClaimResponseDTO> getAllClaims();
+    PageResponseDTO<ClaimResponseDTO> getAllClaims(int page, int size);
 
     /**
      * Retrieves claims by employee ID.
@@ -37,7 +34,7 @@ public interface ClaimService {
      * @param employeeId the employee ID
      * @return list of claims
      */
-    List<ClaimResponseDTO> getClaimsByEmployee(Long employeeId);
+    PageResponseDTO<ClaimResponseDTO> getClaimsByEmployee(Long employeeId, int page, int size);
 
     /**
      * Retrieves claims by reviewer ID.
@@ -45,7 +42,7 @@ public interface ClaimService {
      * @param reviewerId the reviewer ID
      * @return list of claims
      */
-    List<ClaimResponseDTO> getClaimsByReviewer(Long reviewerId);
+    PageResponseDTO<ClaimResponseDTO> getClaimsByReviewer(Long reviewerId, int page, int size);
 
     /**
      * Retrieves claims by status.
@@ -53,7 +50,7 @@ public interface ClaimService {
      * @param status the claim status
      * @return list of claims
      */
-    List<ClaimResponseDTO> getClaimsByStatus(ClaimStatus status);
+    PageResponseDTO<ClaimResponseDTO> getClaimsByStatus(ClaimStatus status, int page, int size);
 
     /**
      * Takes action on a claim.

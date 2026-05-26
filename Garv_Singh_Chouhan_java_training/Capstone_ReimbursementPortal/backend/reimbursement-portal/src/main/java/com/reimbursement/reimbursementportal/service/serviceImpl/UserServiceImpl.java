@@ -133,6 +133,8 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(UserMapper::toResponse)
                 .toList();
+
+
     }
 
     // ========================= DELETE USER =========================
@@ -144,6 +146,10 @@ public class UserServiceImpl implements UserService {
 
         if (userRepository.existsByManagerId(id)) {
             throw new BadRequestException("Cannot delete manager with assigned employees");
+        }
+
+        if (user.getRole() == Role.MANAGER) {
+            reassignClaimsForDeletedReviewer(user, resolveFallbackAdmin());
         }
 
         log.warn("User deleted with id: {}", id);
@@ -163,6 +169,18 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    private void reassignClaimsForDeletedReviewer(User deletedReviewer, User fallbackReviewer) {
+        List<Claim> assignedClaims = claimRepository.findByReviewerId(deletedReviewer.getId());
+
+        assignedClaims.forEach(claim -> claim.setReviewer(fallbackReviewer));
+        claimRepository.saveAll(assignedClaims);
+
+        if (!assignedClaims.isEmpty()) {
+            log.info("Reassigned {} claim(s) from deleted reviewerId={} to admin reviewerId={}",
+                    assignedClaims.size(), deletedReviewer.getId(), fallbackReviewer.getId());
+        }
+    }
+
     private User resolveFallbackAdmin() {
         return userRepository.findByRole(Role.ADMIN)
                 .stream()
@@ -170,3 +188,5 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new BadRequestException("No admin available to act as fallback reviewer"));
     }
 }
+
+

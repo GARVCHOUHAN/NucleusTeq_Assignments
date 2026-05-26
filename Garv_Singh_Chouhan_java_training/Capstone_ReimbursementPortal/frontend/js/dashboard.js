@@ -12,6 +12,8 @@ let filteredUsers  = [];
 let currentPage    = 1;
 let deleteTargetId = null;
 let assignTargetId = null;
+let adminClaimsPage = 0;
+const CLAIMS_PAGE_SIZE = 10;
 
 window.addEventListener('DOMContentLoaded', function () {
     guardPage('ADMIN');
@@ -152,9 +154,9 @@ function renderUserCards() {
             </div>` : ''}
         </div>
 
-        <!-- Footer: ID + remove -->
+        <!-- Footer: user actions -->
         <div class="user-card-footer">
-          <span class="user-id">ID #${u.id}</span>
+          <span class="user-card-context">${u.role === 'EMPLOYEE' ? 'Employee profile' : roleLabel + ' profile'}</span>
           <div style="display:flex;gap:8px;align-items:center">
             ${u.role === 'EMPLOYEE'
               ? `<button class="btn-remove" onclick="openAssignManagerModal(${u.id})">Assign Manager</button>`
@@ -463,6 +465,13 @@ function hideDeleteError() {
     if (box) box.style.display = 'none';
 }
 
+function isAdminFallbackClaim(claim) {
+    if (claim.reviewerRole) {
+        return claim.reviewerRole === 'ADMIN';
+    }
+    const reviewer = allUsers.find(u => Number(u.id) === Number(claim.reviewerId));
+    return reviewer && reviewer.role === 'ADMIN';
+}
 /* ── Admin claim action state ── */
 let adminActionClaimId = null;
 
@@ -471,24 +480,27 @@ async function loadAllClaims() {
     const tbody  = document.getElementById('allClaimsBody');
     const status = document.getElementById('claimStatusFilter').value;
     const admin  = getSession();
-    tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">Loading…</td></tr>';
     try {
-        const claims = status ? await getClaimsByStatus(status) : await getAllClaims();
+        const result = status
+            ? await getClaimsByStatus(status, { page: adminClaimsPage, size: CLAIMS_PAGE_SIZE })
+            : await getAllClaims({ page: adminClaimsPage, size: CLAIMS_PAGE_SIZE });
+        const claims = pageContent(result);
+        renderAdminClaimsPagination(result);
         if (!claims || claims.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">No claims found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">No claims found.</td></tr>';
             return;
         }
         tbody.innerHTML = claims.map(c => {
             const canAdminAct = c.status === 'SUBMITTED' &&
-                admin && Number(c.reviewerId) === Number(admin.id);
-            const actionText = c.status === 'SUBMITTED' ? 'Assigned to manager' : 'NA';
+                admin && admin.role === 'ADMIN' && isAdminFallbackClaim(c);
+            const actionText = c.status === 'SUBMITTED' ? 'Pending review' : 'NA';
 
             return `
       <tr>
-        <td>#${c.id}</td>
         <td>${esc(c.employeeName || c.employeeId || '–')}</td>
         <td><strong>${formatCurrency(c.amount)}</strong></td>
-        <td>${esc(c.description)}</td>
+        <td>${formatDate(c.date)}<br>${esc(c.description)}</td>
         <td><span class="status-badge status-${c.status}">${esc(c.status)}</span></td>
         <td>${c.comment ? esc(c.comment) : '<span style="color:var(--text-muted)">NA</span>'}</td>
         <td>
@@ -504,7 +516,7 @@ async function loadAllClaims() {
       </tr>`;
         }).join('');
     } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="7" class="empty-cell">Error: ${esc(err.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="empty-cell">Error: ${esc(err.message)}</td></tr>`;
     }
 }
 
@@ -581,6 +593,29 @@ document.querySelectorAll('.overlay').forEach(ov => {
 });
 
 /* ── DOM helpers ── */
+function renderAdminClaimsPagination(pageData) {
+    const container = document.getElementById('claimsPagination');
+    if (!container || !pageData || Array.isArray(pageData)) return;
+
+    const pages = pageData.totalPages || 0;
+    if (pages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = `<button class="page-btn" onclick="goAdminClaimsPage(${pageData.page - 1})" ${pageData.first ? 'disabled' : ''}>&#8249;</button>`;
+    for (let i = 0; i < pages; i++) {
+        html += `<button class="page-btn ${i === pageData.page ? 'active' : ''}" onclick="goAdminClaimsPage(${i})">${i + 1}</button>`;
+    }
+    html += `<button class="page-btn" onclick="goAdminClaimsPage(${pageData.page + 1})" ${pageData.last ? 'disabled' : ''}>&#8250;</button>`;
+    container.innerHTML = html;
+}
+
+function goAdminClaimsPage(page) {
+    adminClaimsPage = Math.max(page, 0);
+    loadAllClaims();
+}
+
 function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
 function hide(id)         { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
 function toggleError(id, show) { const el = document.getElementById(id); if (el) el.classList.toggle('show', show); }
