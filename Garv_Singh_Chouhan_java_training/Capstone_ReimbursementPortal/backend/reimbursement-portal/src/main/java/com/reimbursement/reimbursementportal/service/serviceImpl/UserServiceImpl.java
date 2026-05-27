@@ -35,13 +35,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO createUser(UserRequestDTO request) {
 
+        log.info("Creating user: {}", request.getEmail());
+
         // 1. Validate email domain
         if (!ValidationUtil.isValidCompanyEmail(request.getEmail())) {
+            log.warn("Failed to create user {}: invalid company email", request.getEmail());
             throw new BadRequestException("Email must be @company.com");
         }
 
         // 2. Check duplicate email
+        log.info("Checking duplicate email before save: {}", request.getEmail());
         if (userRepository.existsByEmail(request.getEmail())) {
+            log.warn("Failed to create user {}: duplicate email", request.getEmail());
             throw new BadRequestException("Email already exists");
         }
 
@@ -55,9 +60,13 @@ public class UserServiceImpl implements UserService {
         if (request.getRole() == Role.EMPLOYEE && request.getManagerId() != null) {
 
             User manager = userRepository.findById(request.getManagerId())
-                    .orElseThrow(() -> new BadRequestException("Manager not found"));
+                    .orElseThrow(() -> {
+                        log.warn("Failed to assign manager during create: managerId={}", request.getManagerId());
+                        return new BadRequestException("Manager not found");
+                    });
 
             if (manager.getRole() != Role.MANAGER) {
+                log.warn("Invalid manager role during user create: managerId={}", request.getManagerId());
                 throw new BadRequestException("Assigned manager must have MANAGER role");
             }
 
@@ -65,15 +74,17 @@ public class UserServiceImpl implements UserService {
         }
 
         // 6. Save user
+        log.info("Saving user: {}", request.getEmail());
         User savedUser = userRepository.save(user);
 
-        log.info("User created: {}", request.getEmail());
+        log.info("User created: {}", savedUser.getEmail());
         return UserMapper.toResponse(savedUser);
     }
 
     // ========================= GET ALL USERS =========================
     @Override
     public List<UserResponseDTO> getAllUsers() {
+        log.info("Fetching all users");
         return userRepository.findAll()
                 .stream()
                 .map(UserMapper::toResponse)
@@ -83,8 +94,12 @@ public class UserServiceImpl implements UserService {
     // ========================= GET USER BY ID =========================
     @Override
     public UserResponseDTO getUserById(Long id) {
+        log.info("Fetching user by ID: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("User not found with ID: " + id));
+                .orElseThrow(() -> {
+                    log.warn("User not found with ID: {}", id);
+                    return new BadRequestException("User not found with ID: " + id);
+                });
 
         return UserMapper.toResponse(user);
     }
@@ -92,10 +107,15 @@ public class UserServiceImpl implements UserService {
     // ========================= ASSIGN MANAGER =========================
     @Override
     public UserResponseDTO assignManager(Long employeeId, Long managerId) {
+        log.info("Assigning manager: employeeId={}, managerId={}", employeeId, managerId);
         User employee = userRepository.findById(employeeId)
-                .orElseThrow(() -> new BadRequestException("Employee not found with ID: " + employeeId));
+                .orElseThrow(() -> {
+                    log.warn("Employee not found for manager assignment: employeeId={}", employeeId);
+                    return new BadRequestException("Employee not found with ID: " + employeeId);
+                });
 
         if (employee.getRole() != Role.EMPLOYEE) {
+            log.warn("Invalid manager assignment target role: employeeId={}, role={}", employeeId, employee.getRole());
             throw new BadRequestException("Manager can be assigned only to EMPLOYEE users");
         }
 
@@ -108,9 +128,13 @@ public class UserServiceImpl implements UserService {
         }
 
         User manager = userRepository.findById(managerId)
-                .orElseThrow(() -> new BadRequestException("Manager not found with ID: " + managerId));
+                .orElseThrow(() -> {
+                    log.warn("Manager not found for assignment: managerId={}", managerId);
+                    return new BadRequestException("Manager not found with ID: " + managerId);
+                });
 
         if (manager.getRole() != Role.MANAGER) {
+            log.warn("Invalid role for assigned manager: managerId={}, role={}", managerId, manager.getRole());
             throw new BadRequestException("Assigned manager must have MANAGER role");
         }
 
@@ -125,7 +149,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponseDTO> getEmployeesByManager(Long managerId) {
 
+        log.info("Fetching employees for manager: {}", managerId);
         if (!userRepository.existsById(managerId)) {
+            log.warn("Manager not found while fetching employees: {}", managerId);
             throw new BadRequestException("Manager not found with ID: " + managerId);
         }
 
@@ -141,10 +167,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
 
+        log.warn("Deleting user: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("User not found with ID: " + id));
+                .orElseThrow(() -> {
+                    log.warn("User not found for delete: {}", id);
+                    return new BadRequestException("User not found with ID: " + id);
+                });
 
         if (userRepository.existsByManagerId(id)) {
+            log.warn("Cannot delete manager with assigned employees: {}", id);
             throw new BadRequestException("Cannot delete manager with assigned employees");
         }
 
@@ -185,8 +216,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByRole(Role.ADMIN)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException("No admin available to act as fallback reviewer"));
+                .orElseThrow(() -> {
+                    log.error("Database operation failed: no admin available for fallback reviewer");
+                    return new BadRequestException("No admin available to act as fallback reviewer");
+                });
     }
 }
-
 

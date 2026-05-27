@@ -10,6 +10,8 @@ import com.reimbursement.reimbursementportal.repository.UserRepository;
 import com.reimbursement.reimbursementportal.dto.StandardAPIResponse;
 import com.reimbursement.reimbursementportal.service.UserService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     private final UserRepository userRepository;
     private final UserService userService;
 
@@ -41,11 +45,15 @@ public class AuthController {
     public ResponseEntity<StandardAPIResponse<UserResponseDTO>> signup(
             @Valid @RequestBody UserRequestDTO request) {
 
+        log.info("Account creation requested: {}", request.getEmail());
+
         if (request.getRole() != Role.EMPLOYEE) {
+            log.warn("Invalid public signup role attempt: {} role={}", request.getEmail(), request.getRole());
             throw new BadRequestException("Public signup is allowed only for employees");
         }
 
         UserResponseDTO response = userService.createUser(request);
+        log.info("Account created: {}", request.getEmail());
 
         StandardAPIResponse<UserResponseDTO> apiResponse =
                 StandardAPIResponse.<UserResponseDTO>builder()
@@ -68,6 +76,7 @@ public class AuthController {
     public ResponseEntity<StandardAPIResponse<UserResponseDTO>> me(Authentication authentication) {
 
         String email = authentication.getName();
+        log.info("Authenticated user profile requested: {}", email);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Logged-in user not found"));

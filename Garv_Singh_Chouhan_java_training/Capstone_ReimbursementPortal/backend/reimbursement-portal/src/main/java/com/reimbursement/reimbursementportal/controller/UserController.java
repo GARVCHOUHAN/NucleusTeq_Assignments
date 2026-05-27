@@ -27,6 +27,8 @@ import com.reimbursement.reimbursementportal.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +50,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
     private final UserService userService;
 
     /**
@@ -57,7 +61,9 @@ public class UserController {
     public ResponseEntity<StandardAPIResponse<UserResponseDTO>> createUser(
             @Valid @RequestBody UserRequestDTO request) {
 
+        log.info("Create user request received: {}", request.getEmail());
         UserResponseDTO response = userService.createUser(request);
+        log.info("Create user request completed: {}", response.getEmail());
 
         StandardAPIResponse<UserResponseDTO> apiResponse =
                 StandardAPIResponse.<UserResponseDTO>builder()
@@ -75,7 +81,9 @@ public class UserController {
     @GetMapping
     public ResponseEntity<StandardAPIResponse<List<UserResponseDTO>>> getAllUsers() {
 
+        log.info("Fetch user list request received");
         List<UserResponseDTO> response = userService.getAllUsers();
+        log.info("Fetch user list request completed: count={}", response.size());
 
         StandardAPIResponse<List<UserResponseDTO>> apiResponse =
                 StandardAPIResponse.<List<UserResponseDTO>>builder()
@@ -94,7 +102,9 @@ public class UserController {
     public ResponseEntity<StandardAPIResponse<UserResponseDTO>> getUserById(
             @PathVariable Long id) {
 
+        log.info("Fetch user by ID request received: {}", id);
         UserResponseDTO response = userService.getUserById(id);
+        log.info("Fetch user by ID request completed: {}", id);
 
         StandardAPIResponse<UserResponseDTO> apiResponse =
                 StandardAPIResponse.<UserResponseDTO>builder()
@@ -114,7 +124,9 @@ public class UserController {
             @PathVariable Long employeeId,
             @RequestParam(required = false) Long managerId) {
 
+        log.info("Assign manager request received: employeeId={}, managerId={}", employeeId, managerId);
         UserResponseDTO response = userService.assignManager(employeeId, managerId);
+        log.info("Assign manager request completed: employeeId={}, managerId={}", employeeId, managerId);
 
         StandardAPIResponse<UserResponseDTO> apiResponse =
                 StandardAPIResponse.<UserResponseDTO>builder()
@@ -133,7 +145,10 @@ public class UserController {
     public ResponseEntity<StandardAPIResponse<List<UserResponseDTO>>> getEmployeesByManager(
             @PathVariable Long managerId) {
 
+        log.info("Fetch employees by manager request received: managerId={}", managerId);
         List<UserResponseDTO> response = userService.getEmployeesByManager(managerId);
+        log.info("Fetch employees by manager request completed: managerId={}, count={}",
+                managerId, response.size());
 
         StandardAPIResponse<List<UserResponseDTO>> apiResponse =
                 StandardAPIResponse.<List<UserResponseDTO>>builder()
@@ -151,7 +166,9 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<StandardAPIResponse<String>> deleteUser(@PathVariable Long id) {
 
+        log.warn("Delete user request received: {}", id);
         userService.deleteUser(id);
+        log.warn("Delete user request completed: {}", id);
 
         StandardAPIResponse<String> apiResponse =
                 StandardAPIResponse.<String>builder()

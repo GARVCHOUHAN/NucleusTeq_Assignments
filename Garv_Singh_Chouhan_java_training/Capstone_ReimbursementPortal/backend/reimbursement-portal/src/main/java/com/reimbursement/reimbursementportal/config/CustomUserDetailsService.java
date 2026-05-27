@@ -4,6 +4,8 @@ import com.reimbursement.reimbursementportal.entity.User;
 import com.reimbursement.reimbursementportal.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +20,8 @@ import java.util.Collections;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomUserDetailsService.class);
 
     /**
      * Repository used to fetch user data.
@@ -34,8 +38,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
+        log.info("User login attempt: {}", email);
+
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    log.warn("Invalid credentials for email: {}", email);
+                    return new UsernameNotFoundException("User not found");
+                });
+
+        log.info("User credentials loaded for authentication: {}", email);
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),

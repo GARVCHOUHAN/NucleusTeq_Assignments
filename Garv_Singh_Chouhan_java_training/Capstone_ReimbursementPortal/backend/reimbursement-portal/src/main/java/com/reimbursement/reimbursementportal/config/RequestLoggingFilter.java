@@ -22,8 +22,19 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        log.info("API Request: {} {}", request.getMethod(), request.getRequestURI());
+        long startTime = System.currentTimeMillis();
+        String method = request.getMethod();
+        String uri = request.getRequestURI();
+        String ipAddress = request.getRemoteAddr();
 
-        filterChain.doFilter(request, response);
+        log.info("API Request: {} {} IP={}", method, uri, ipAddress);
+
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            long duration = System.currentTimeMillis() - startTime;
+            log.info("API Response: {} {} Status={} Time={}ms IP={}",
+                    method, uri, response.getStatus(), duration, ipAddress);
+        }
     }
 }
