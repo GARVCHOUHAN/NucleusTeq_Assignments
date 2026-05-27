@@ -155,7 +155,7 @@ class ClaimServiceImplTest {
         BadRequestException ex = assertThrows(BadRequestException.class,
                 () -> claimService.takeAction(20L, 2L, actionRequest(ClaimStatus.SUBMITTED, "")));
 
-        assertEquals("Invalid action — cannot set status to SUBMITTED", ex.getMessage());
+        assertEquals("Invalid action - cannot set status to SUBMITTED", ex.getMessage());
     }
 
     @Test
