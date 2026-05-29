@@ -1,12 +1,8 @@
 package com.reimbursement.reimbursementportal.dto.request;
 
 import com.reimbursement.reimbursementportal.enums.Role;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 
 /**
  * Request DTO for user creation.
@@ -19,6 +15,7 @@ public class UserRequestDTO {
      */
     @NotBlank(message = "Name is required")
     @Size(min = 2, max = 30, message = "Name must be between 2 and 30 characters")
+    @Pattern(regexp = "^[A-Za-z\\s]+$", message = "Name must contain only letters and spaces")
     private String name;
 
     /**

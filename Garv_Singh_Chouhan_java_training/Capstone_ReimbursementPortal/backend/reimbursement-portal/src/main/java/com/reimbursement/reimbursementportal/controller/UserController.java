@@ -95,6 +95,7 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
+
     /**
      * Retrieves a user by ID.
      */

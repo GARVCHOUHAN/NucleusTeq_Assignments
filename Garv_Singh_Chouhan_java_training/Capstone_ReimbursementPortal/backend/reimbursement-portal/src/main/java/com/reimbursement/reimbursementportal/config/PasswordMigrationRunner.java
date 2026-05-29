@@ -26,7 +26,7 @@ public class PasswordMigrationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         int migrated = 0;
-
+// my name is garv
         for (User user : userRepository.findAll()) {
             String password = user.getPassword();
             if (password != null && !password.startsWith(BCRYPT_PREFIX)) {
