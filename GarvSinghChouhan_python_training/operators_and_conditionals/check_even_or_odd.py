@@ -1,0 +1,1 @@
+﻿def check_even_or_odd(number: int) -> str: """Return Even or Odd."""
