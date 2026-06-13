@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReimburseHub — Employee</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="logo">
+        <div class="logo-name">Reimburse<span>Hub</span></div>
+        <div class="logo-sub">Employee Portal</div>
+    </div>
+    <nav class="nav">
+        <p class="nav-section">My Claims</p>
+        <a href="#" class="nav-link active" data-tab="submit">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Submit Claim
+        </a>
+        <a href="#" class="nav-link" data-tab="history">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            My Claims
+            <span class="nav-badge" id="claimCountBadge">–</span>
+        </a>
+    </nav>
+    <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebarAvatar">EM</div>
+        <div>
+            <div class="sidebar-name" id="sidebarName">Employee</div>
+            <div class="sidebar-email" id="sidebarEmail">emp@company.com</div>
+        </div>
+    </div>
+    <button class="btn btn-ghost btn-block logout-btn" onclick="logout()">Logout</button>
+</aside>
+
+<main class="main">
+    <header class="topbar">
+        <div>
+            <h1 class="page-heading" id="pageHeading">Submit a Claim</h1>
+            <p class="page-sub" id="pageSub">Fill in the form to request reimbursement</p>
+        </div>
+    </header>
+
+    <div class="content">
+
+        <!-- ════ SUBMIT TAB ════ -->
+        <div id="tabSubmit">
+            <div class="form-card">
+                <h3 class="form-card-title">New Reimbursement Request</h3>
+
+                <!-- Manager info banner — shown if employee has a manager -->
+                <div id="managerInfoBanner" style="display:none;margin-bottom:14px;padding:10px 14px;background:var(--surface2);border-radius:var(--radius-sm);border-left:2px solid var(--green);font-size:12.5px;color:var(--text-mid)">
+                    Your claims will be reviewed by <strong id="managerInfoName"></strong>
+                </div>
+                <div id="noManagerBanner" style="display:none;margin-bottom:14px;padding:10px 14px;background:var(--amber-light);border-radius:var(--radius-sm);border-left:2px solid var(--amber);font-size:12.5px;color:var(--amber)">
+                    No manager assigned — your claims will be reviewed by an Admin.
+                </div>
+
+                <div class="alert alert-error"   id="submitError"   style="display:none"></div>
+                <div class="alert alert-success" id="submitSuccess" style="display:none"></div>
+
+                <div class="form-group">
+                    <label>Amount (₹) *</label>
+                    <input class="form-input" id="claimAmount" type="number" min="1" max="100000"
+                           placeholder="e.g. 2500" />
+                    <span class="form-error" id="errAmount">Please enter an amount from 1 to 100000.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Claim Date *</label>
+                    <input class="form-input" id="claimDate" type="date" />
+                    <span class="form-error" id="errClaimDate">Please select a valid claim date.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea class="form-input" id="claimDesc" rows="3"
+                              placeholder="Briefly describe what this expense is for…"></textarea>
+                    <span class="form-error" id="errDesc">Description is required.</span>
+                </div>
+
+                <button class="btn btn-primary" id="submitClaimBtn" onclick="submitClaim()">
+                    <span id="submitLabel">Submit Claim</span>
+                    <span class="spinner" id="submitSpinner"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ════ HISTORY TAB ════ -->
+        <div id="tabHistory" style="display:none">
+            <div class="filter-bar">
+                <select class="filter-select" id="empStatusFilter" onchange="loadEmployeeClaims()">
+                    <option value="">All Statuses</option>
+                    <option value="SUBMITTED">Submitted</option>
+                    <option value="APPROVED">Approved</option>
+                    <option value="REJECTED">Rejected</option>
+                </select>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Comment</th>
+                    </tr>
+                    </thead>
+                    <tbody id="empClaimsBody">
+                    <tr><td colspan="5" class="empty-cell">Loading your claims…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="employeeClaimsPagination"></div>
+        </div>
+
+    </div>
+</main>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/claims.js"></script>
+<script src="js/employee.js"></script>
+
+</body>
+</html>
+
