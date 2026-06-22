@@ -1,25 +1,8 @@
-﻿"""
-Exception Handling Assignment Solutions.
-
-This module demonstrates:
-
-1. ValueError handling
-2. ZeroDivisionError handling
-3. try-except-else-finally
-4. Multiple exception handling
-5. Catching all exceptions
-6. Raising ValueError manually
-7. Custom exception handling
-8. FileNotFoundError handling
-"""
-
+﻿
 from typing import Any
 
 from numpy import number
-
-
 MINIMUM_AGE = 18
-
 
 class AgeException(Exception):
     """
