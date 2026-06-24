@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TodoResponseDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">todo-application</a> &gt; <a href="index.source.html" class="el_package">com.garv.todo.dto</a> &gt; <span class="el_source">TodoResponseDTO.java</span></div><h1>TodoResponseDTO.java</h1><pre class="source lang-java linenums">package com.garv.todo.dto;
+
+import com.garv.todo.entity.TodoStatus;
+
+import java.time.LocalDateTime;
+
+public class TodoResponseDTO {
+
+    private Long id;
+    private String title;
+    private String description;
+    private TodoStatus status;
+    private LocalDateTime createdAt;
+
+<span class="fc" id="L15">    public TodoResponseDTO() {</span>
+<span class="fc" id="L16">    }</span>
+
+<span class="fc" id="L18">    public TodoResponseDTO(Long id, String title, String description, TodoStatus status, LocalDateTime createdAt) {</span>
+<span class="fc" id="L19">        this.id = id;</span>
+<span class="fc" id="L20">        this.title = title;</span>
+<span class="fc" id="L21">        this.description = description;</span>
+<span class="fc" id="L22">        this.status = status;</span>
+<span class="fc" id="L23">        this.createdAt = createdAt;</span>
+<span class="fc" id="L24">    }</span>
+
+    public Long getId() {
+<span class="fc" id="L27">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L31">        this.id = id;</span>
+<span class="fc" id="L32">    }</span>
+
+    public String getTitle() {
+<span class="fc" id="L35">        return title;</span>
+    }
+
+    public void setTitle(String title) {
+<span class="fc" id="L39">        this.title = title;</span>
+<span class="fc" id="L40">    }</span>
+
+    public String getDescription() {
+<span class="fc" id="L43">        return description;</span>
+    }
+
+    public void setDescription(String description) {
+<span class="fc" id="L47">        this.description = description;</span>
+<span class="fc" id="L48">    }</span>
+
+    public TodoStatus getStatus() {
+<span class="fc" id="L51">        return status;</span>
+    }
+
+    public void setStatus(TodoStatus status) {
+<span class="fc" id="L55">        this.status = status;</span>
+<span class="fc" id="L56">    }</span>
+
+    public LocalDateTime getCreatedAt() {
+<span class="fc" id="L59">        return createdAt;</span>
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+<span class="fc" id="L63">        this.createdAt = createdAt;</span>
+<span class="fc" id="L64">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

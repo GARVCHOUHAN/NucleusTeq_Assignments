@@ -1,0 +1,492 @@
+[33mcommit 0005ad724798eda01153805f270211d05f4e18aa[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sat Jun 13 00:40:57 2026 +0530
+
+    added gitignore and requirements file
+
+[33mcommit 95408176a88e0a617bd98c926c8a1d75fe85943b[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sat Jun 13 00:27:59 2026 +0530
+
+    improve file structure
+
+[33mcommit c8d6d9cae0f392a9d1a75d1951b7731a0abb59a2[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sat Jun 13 00:23:28 2026 +0530
+
+    implement classes, inheritance, encapsulation, and polymorphism examples
+
+[33mcommit c9dde0cdf5b37d786d65a7c797820f760bc45d3c[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sat Jun 13 00:12:10 2026 +0530
+
+    implemented file handling questions from 35 to 39
+
+[33mcommit 2b1d609e872830cb8a35052185e6269f43590e9e[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sat Jun 13 00:03:49 2026 +0530
+
+    implemented data structures tuple set and dictionary problems i.e. from question 28 to 34
+
+[33mcommit 0886e2c6877f7d68fb19a5d9e49fe102211dc9d6[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Jun 12 23:54:53 2026 +0530
+
+    implemented data structures list problems from question 25 to 27
+
+[33mcommit 0475611f7519d6258aea00faeb0d485a08f73f1a[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Jun 12 23:33:20 2026 +0530
+
+    implement module-based programming exercises
+
+[33mcommit 45229030a908652d23f7a2a48c63453b30e37a3a[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Jun 12 23:21:32 2026 +0530
+
+    implemented and added functions from question 17 to question 20
+
+[33mcommit 5fccbccff84c562e98b78e3882cb3ed8a0ef9f89[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Jun 12 23:10:59 2026 +0530
+
+    added loops questions starting from question 12 to 16
+
+[33mcommit d7f5d517b56ca20895d3b646da613720baac7c50[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Jun 12 22:58:53 2026 +0530
+
+    added operators and conditionals questions from 7 to 11
+
+[33mcommit 9ff88c9ea0c02b572aecb5e9dac0f4c70206a83d[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Jun 12 22:32:43 2026 +0530
+
+    added variables and datatypes questions
+
+[33mcommit 5903b86ee77378d0024efec5e108ac6532ef3c76[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Jun 12 22:02:07 2026 +0530
+
+    added basic folder structure and python basics and introduction part
+
+[33mcommit 07e65a5dee3e39cf88672777018c54f0a4ba9c51[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:42:32 2026 +0530
+
+    Document architecture logging testing and notification flow
+
+[33mcommit 0e4742fdd180d03b8fd68304def79202ca01463a[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:42:07 2026 +0530
+
+    Add Spring Boot context load test
+
+[33mcommit 7ca11e04729aacf52df92f90ed3d563d66c8ff96[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:40:48 2026 +0530
+
+    Add DTO validation and entity tests
+
+[33mcommit e78e64824d86a70352b070c1833cedca594da55f[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:40:09 2026 +0530
+
+    Add unit tests for DTO and entity mapping
+
+[33mcommit f4b25b76c0e4e864e492b4259bfc93b5ccb2e4b4[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:39:35 2026 +0530
+
+    Add service layer unit tests using Mockito
+
+[33mcommit 9538341d0f2baa302322b3614ad5e0f5db5962a9[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:38:47 2026 +0530
+
+    Add controller layer unit tests using MockMvc
+
+[33mcommit a099e8cf3913c4ba183cffa2233a4d615e7e97fa[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:30:38 2026 +0530
+
+    Add global exception handling and custom exceptions
+
+[33mcommit 5b243dae0f349cc84f3f8b2c3054d135f5fdbbc3[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:29:13 2026 +0530
+
+    Add Todo REST controller endpoints
+
+[33mcommit a93dfe35876b351ced0884b6df735f193bf74a74[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:26:57 2026 +0530
+
+    Create Todo service interface
+
+[33mcommit faa0affb6751013a3fcea23e4e8693c94a1acbdf[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:25:16 2026 +0530
+
+    Add manual DTO to entity mapping
+
+[33mcommit 425984c2abe91f785e3742c0c10253bfd07a6be9[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:24:02 2026 +0530
+
+    Implement TodoRepository using JpaRepository
+
+[33mcommit 509a83cb81c6a4ab6f8ec576eb0c85588b53ad71[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:23:22 2026 +0530
+
+    Add TodoDTO with validation constraints
+
+[33mcommit 1077204463c6f62bde92d62d6f4e684bdb71c461[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:20:40 2026 +0530
+
+    add Status enum
+
+[33mcommit 1452f1f1a14ab9f7363271f1bccb51001665d181[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:18:48 2026 +0530
+
+    add todo entity
+
+[33mcommit 0a0fc5d75faede1043654981d7fbe573ccf55426[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Tue Jun 2 23:15:11 2026 +0530
+
+    Initialize Spring Boot Todo application with Maven
+
+[33mcommit 15beb3edd70ad2b4d24f8f2d4d83fc9e48edb816[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Apr 17 01:24:09 2026 +0530
+
+    added some final implementations and corrections
+
+[33mcommit 9d071b8cb20dd86bb000dc196337aed54ef32cae[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Apr 17 01:14:33 2026 +0530
+
+    some corrections
+
+[33mcommit 1c83c94db5933892933ded554433051608e595ca[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Apr 17 01:12:59 2026 +0530
+
+    implemented userController
+
+[33mcommit 7cc867fb8532f7018dc6bd118d6bbe333c8f2bad[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Apr 17 01:07:05 2026 +0530
+
+    implemented userService
+
+[33mcommit f663b1242b783630e557a0d2b9395ac56f612749[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Apr 17 00:53:08 2026 +0530
+
+    implemented userRepository
+
+[33mcommit ebeb39a0ef0546553fe9b23739aa7cd7f5c4764d[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Apr 17 00:44:29 2026 +0530
+
+    implemented userRequest dto
+
+[33mcommit 94765ae45d789498717ffe63c8fb778e56fc2e71[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Fri Apr 17 00:42:21 2026 +0530
+
+    implemented user model
+
+[33mcommit 3dfb461ab2b00e9691b656a2e23978eec7a7ec23[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:40:25 2026 +0530
+
+    implemented message controller
+
+[33mcommit 7cc9a158d4b2efc8a05d24a8150883426ad6ec54[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:38:25 2026 +0530
+
+    implemented message service implementation
+
+[33mcommit 7fc422070b7fa5deded8d6857c93077ffc756a51[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:35:26 2026 +0530
+
+    implemented short and long message formatter
+
+[33mcommit 3db67dac81730e9d39b985f9277f5f202141960c[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:18:05 2026 +0530
+
+    implemented notification controller
+
+[33mcommit 0d1094d8b14aad66ca2abf99e3df4313fa82fd00[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:17:01 2026 +0530
+
+    implemented notification service
+
+[33mcommit cf9b95e2832566b3f5c6935085952bd485200223[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:15:42 2026 +0530
+
+    implemented notification component
+
+[33mcommit 6710b016d406b8067fffd11a5f31e73bf5d0d60f[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:14:27 2026 +0530
+
+    implemented user controller functionalities
+
+[33mcommit a579c979d018c1d59f607b486e3b86efbd808081[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:11:34 2026 +0530
+
+    implemented exception handling as well as service layer functionalities
+
+[33mcommit 84c04f031c867f6291b1109294b1ada25c3d6947[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:07:01 2026 +0530
+
+    implemented user repository
+
+[33mcommit 1d8b5a62ff104a482a36d056b9aafc8c06d7a5c8[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 22:02:11 2026 +0530
+
+    implemented user Request DTO
+
+[33mcommit 6926ebf408fe6655d75e8ad245f2b180adaca48a[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 21:58:33 2026 +0530
+
+    restored everything
+
+[33mcommit f973383d50f9839791412137f16b71c8346bb108[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 21:25:44 2026 +0530
+
+    Fixed folder structure for session2
+
+[33mcommit 4f9705c6e7b7fe6a9eda76b52a0f546de1dc6b41[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 21:24:26 2026 +0530
+
+    Fixed folder structure for session2
+
+[33mcommit 5556aa5376474245c90a0c184d710dec68c6e661[m
+Merge: 5ddd00d e54f7c6
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 21:17:37 2026 +0530
+
+    Merge branch 'main' of https://github.com/GARVCHOUHAN/NucleusTeq_Assignments
+
+[33mcommit 5ddd00df7c291b70ee5b54abf6979ed74409daa9[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Thu Apr 16 19:52:29 2026 +0530
+
+    Initial Spring Boot project setup
+
+[33mcommit e54f7c6df6cb83a2f1e8d9d0cbd42f8fce660435[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 23:52:43 2026 +0530
+
+    added multithreaded functions
+
+[33mcommit 733f596b55f5c534f09c7cbbfff1cf83cfd2c72f[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 23:50:51 2026 +0530
+
+    implemented fileread.java
+
+[33mcommit 7e7d59ee5bb8a5f48fe1bb0fbf0deb13aab199c0[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 23:46:57 2026 +0530
+
+    implemented exceptionHandling in java
+
+[33mcommit 5a59f26e06d012159eabe4965c5368f00440bffb[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 23:44:20 2026 +0530
+
+    implemented strings, countvowels and reverse functions/questions
+
+[33mcommit cfab7e1c31b4aff4f836d145ad7c6806e84b89c9[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 23:38:27 2026 +0530
+
+    implemented oops student as well as graduate student
+
+[33mcommit 95ca2c10f995c94361f6735ac132f9f87c69bd81[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 23:29:39 2026 +0530
+
+    implemented linear search
+
+[33mcommit 8aaf54695c72258fcf77c9503d6cd86c989e04fa[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 23:28:11 2026 +0530
+
+    implemented bubblesort and average functions
+
+[33mcommit fa11477b82b6f20d6eb025485236d122af52c452[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 23:22:32 2026 +0530
+
+    implemented controlflow functions
+
+[33mcommit 85e02a09df811b40185d86d3aa651cbbfe41d1a4[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 23:11:37 2026 +0530
+
+    implemented operators and temprature questions
+
+[33mcommit 2d1200861e76c5753be7fd9611be13b9a722007a[m[33m ([m[1;32mjavascript[m[33m)[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 21:24:48 2026 +0530
+
+    Updated CSS styles and added VS Code settings
+
+[33mcommit 3014c83404445c70444ae6ca7b92101367e0cba5[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 21:22:32 2026 +0530
+
+    implemented all basic java functions
+
+[33mcommit 060f059e4405d42ae5d9e186c4b5018ecd45bc49[m[33m ([m[1;31morigin/javascript[m[33m)[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Wed Apr 8 20:58:03 2026 +0530
+
+    basic area calculator implemented
+
+[33mcommit 38d52a34a9fe54afb217fa735bcbe5d93069582e[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:57:51 2026 +0530
+
+    added readme.md file
+
+[33mcommit bec043e67dad6cd99d651f004a68b104275006b3[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:47:28 2026 +0530
+
+    connect dashboard controls and initial product loading
+
+[33mcommit 76c7be578386d0be4aa0f8485e0d0f85bebfc831[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:43:52 2026 +0530
+
+    make functions to handel,validate and reset form
+
+[33mcommit 436bfd4f4fc763f1fddbc3f96fc414b4d0c85b80[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:42:28 2026 +0530
+
+    made renderproducts, attachCardButton,deleteProduct and startEditingProduct functions
+
+[33mcommit 9b9bd7980e60eb4f848f9668c3f7ce46913afb69[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:40:52 2026 +0530
+
+    made functions capitalizeWord,getstockstatus, populateCategoryFilter,updateAnalytics,getFilteredAndSortedProducts
+
+[33mcommit 3260c3416c3c2800c369b2ac6160aafe65263382[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:38:25 2026 +0530
+
+    made a function for fetching products with delay and formatCurrency
+
+[33mcommit 9672b5e65c8026ca3c11b1384da46863e17cdd71[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:36:28 2026 +0530
+
+    styled error-message and mdeia query for responsiveness
+
+[33mcommit a03339c35916c5bbfb1a8d762b3f790d4ddefb86[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:34:51 2026 +0530
+
+    styled stock and button
+
+[33mcommit 516f9cf65baa4f62e3ccdc5ee02d00de3841e3f8[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:33:30 2026 +0530
+
+    styled category,product-card,grid
+
+[33mcommit bfec35da83533278020fd2c9523bed017bd06705[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:31:06 2026 +0530
+
+    styled form,analytics-card,button
+
+[33mcommit 2e287362dd78cb2b405db07e785384f691a008c1[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:22:54 2026 +0530
+
+    styled card,section and some part of form
+
+[33mcommit d582e7e131286fece5a59812142428089faac7a4[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:21:22 2026 +0530
+
+    creted form section footer and overall design of the application
+
+[33mcommit 9d5bac61d49ae83e591e9050cbb294a91aaaf020[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:19:45 2026 +0530
+
+    creted products section card
+
+[33mcommit 47ef6e440a829a4fb98cdae55b84839dd15128ef[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:18:33 2026 +0530
+
+    create analytics structure
+
+[33mcommit bb054153a012205a4fdaee8ee12076975004ac23[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 23:14:24 2026 +0530
+
+    create product inventory dashboard project structure
+
+[33mcommit f2b58550e7cc4014945ea2331de5b3c231c0aed3[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 19:03:49 2026 +0530
+
+    added screen shots
+
+[33mcommit d718f3d019c676945497ed7a29b96da46524dc30[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 18:55:10 2026 +0530
+
+    output of the desired results
+
+[33mcommit 9bb1b6af6867bcd5b92fb98fe3631eca8c127e0e[m
+Author: garv <garvchouhan5@gmail.com>
+Date:   Sun Mar 22 18:49:48 2026 +0530
+
+    Create Readme.md
+
+[33mcommit 712b69759bfeb6f71cabfc1778e7d71844f87e67[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sat Mar 21 19:20:31 2026 +0530
+
+    add class topper calculation and final console output
+
+[33mcommit 254e39e7abdb68b3752f0ff1c0ebac10f054c2c8[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sat Mar 21 19:19:05 2026 +0530
+
+    implement subject wise average marks of student
+
+[33mcommit fc4c29aa490d9ce0ac3469ca3eba3eb3f93a4c8e[m
+Author: Garv Singh Chouhan <garvchouhan5@gmail.com>
+Date:   Sat Mar 21 19:17:49 2026 +0530
+
+    implement printstudentlist function and subjectwise highest marks

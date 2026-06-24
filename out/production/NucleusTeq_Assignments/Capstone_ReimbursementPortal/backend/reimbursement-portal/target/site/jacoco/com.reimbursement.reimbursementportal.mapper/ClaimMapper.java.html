@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClaimMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reimbursement-portal</a> &gt; <a href="index.source.html" class="el_package">com.reimbursement.reimbursementportal.mapper</a> &gt; <span class="el_source">ClaimMapper.java</span></div><h1>ClaimMapper.java</h1><pre class="source lang-java linenums">package com.reimbursement.reimbursementportal.mapper;
+
+
+import com.reimbursement.reimbursementportal.dto.request.ClaimRequestDTO;
+import com.reimbursement.reimbursementportal.dto.response.ClaimResponseDTO;
+import com.reimbursement.reimbursementportal.entity.Claim;
+import com.reimbursement.reimbursementportal.entity.User;
+import com.reimbursement.reimbursementportal.enums.ClaimStatus;
+
+import java.math.BigDecimal;
+
+/**
+ * Mapper for Claim entity.
+ */
+<span class="nc" id="L15">public class ClaimMapper {</span>
+
+    /**
+     * Converts Claim entity to ClaimResponseDTO.
+     *
+     * @param claim the claim entity
+     * @return the claim response DTO
+     */
+    public static ClaimResponseDTO toResponse(Claim claim) {
+
+<span class="fc" id="L25">        return ClaimResponseDTO.builder()</span>
+<span class="fc" id="L26">                .id(claim.getId())</span>
+<span class="pc bpc" id="L27" title="1 of 2 branches missed.">                .amount(claim.getAmount() != null ? claim.getAmount().doubleValue() : 0.0)</span>
+<span class="fc" id="L28">                .description(claim.getDescription())</span>
+<span class="fc" id="L29">                .date(claim.getDate())</span>
+<span class="fc" id="L30">                .status(claim.getStatus())</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">                .employeeId(claim.getEmployee() != null ? claim.getEmployee().getId() : null)</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">                .employeeName(claim.getEmployee() != null ? claim.getEmployee().getName() : null)</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">                .reviewerId(claim.getReviewer() != null ? claim.getReviewer().getId() : null)</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">                .reviewerName(claim.getReviewer() != null ? claim.getReviewer().getName() : null)</span>
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">                .reviewerRole(claim.getReviewer() != null ? claim.getReviewer().getRole() : null)</span>
+<span class="fc" id="L36">                .comment(claim.getComment())</span>
+<span class="fc" id="L37">                .build();</span>
+    }
+
+    /**
+     * Converts ClaimRequestDTO to Claim entity.
+     *
+     * @param request the claim request
+     * @param employee the employee
+     * @param reviewer the reviewer
+     * @return the claim entity
+     */
+    public static Claim toEntity(ClaimRequestDTO request, User employee, User reviewer) {
+
+<span class="nc" id="L50">        Claim claim = new Claim();</span>
+<span class="nc" id="L51">        claim.setAmount(BigDecimal.valueOf(request.getAmount()));</span>
+<span class="nc" id="L52">        claim.setDescription(request.getDescription());</span>
+<span class="nc" id="L53">        claim.setDate(request.getClaimDate());</span>
+<span class="nc" id="L54">        claim.setStatus(ClaimStatus.SUBMITTED);</span>
+<span class="nc" id="L55">        claim.setEmployee(employee);</span>
+<span class="nc" id="L56">        claim.setReviewer(reviewer);</span>
+
+<span class="nc" id="L58">        return claim;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

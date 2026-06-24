@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reimbursement-portal</a> &gt; <a href="index.source.html" class="el_package">com.reimbursement.reimbursementportal.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.reimbursement.reimbursementportal.controller;
+//
+//import com.reimbursement.reimbursementportal.entity.User;
+//import com.reimbursement.reimbursementportal.service.UserService;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.web.bind.annotation.*;
+//
+//@RestController
+//@RequestMapping(&quot;/users&quot;)
+//@CrossOrigin(&quot;*&quot;)
+//public class UserController {
+//
+//    @Autowired
+//    private UserService userService;
+//
+//    @PostMapping(&quot;/register&quot;)
+//    public User registerUser(@RequestBody User user) {
+//        return userService.registerUser(user);
+//    }
+//}
+
+
+import com.reimbursement.reimbursementportal.dto.request.UserRequestDTO;
+import com.reimbursement.reimbursementportal.dto.response.UserResponseDTO;
+import com.reimbursement.reimbursementportal.dto.StandardAPIResponse;
+import com.reimbursement.reimbursementportal.service.UserService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+/**
+ * Controller for managing user operations.
+ */
+@RestController
+@RequestMapping(&quot;/api/users&quot;)
+@RequiredArgsConstructor
+public class UserController {
+
+<span class="fc" id="L53">    private static final Logger log = LoggerFactory.getLogger(UserController.class);</span>
+
+    private final UserService userService;
+
+    /**
+     * Creates a new user.
+     */
+    @PostMapping
+    public ResponseEntity&lt;StandardAPIResponse&lt;UserResponseDTO&gt;&gt; createUser(
+            @Valid @RequestBody UserRequestDTO request) {
+
+<span class="fc" id="L64">        log.info(&quot;Create user request received: {}&quot;, request.getEmail());</span>
+<span class="fc" id="L65">        UserResponseDTO response = userService.createUser(request);</span>
+<span class="fc" id="L66">        log.info(&quot;Create user request completed: {}&quot;, response.getEmail());</span>
+
+        StandardAPIResponse&lt;UserResponseDTO&gt; apiResponse =
+<span class="fc" id="L69">                StandardAPIResponse.&lt;UserResponseDTO&gt;builder()</span>
+<span class="fc" id="L70">                        .success(true)</span>
+<span class="fc" id="L71">                        .message(&quot;User created successfully&quot;)</span>
+<span class="fc" id="L72">                        .data(response)</span>
+<span class="fc" id="L73">                        .build();</span>
+
+<span class="fc" id="L75">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    /**
+     * Retrieves all users.
+     */
+    @GetMapping
+    public ResponseEntity&lt;StandardAPIResponse&lt;List&lt;UserResponseDTO&gt;&gt;&gt; getAllUsers() {
+
+<span class="fc" id="L84">        log.info(&quot;Fetch user list request received&quot;);</span>
+<span class="fc" id="L85">        List&lt;UserResponseDTO&gt; response = userService.getAllUsers();</span>
+<span class="fc" id="L86">        log.info(&quot;Fetch user list request completed: count={}&quot;, response.size());</span>
+
+        StandardAPIResponse&lt;List&lt;UserResponseDTO&gt;&gt; apiResponse =
+<span class="fc" id="L89">                StandardAPIResponse.&lt;List&lt;UserResponseDTO&gt;&gt;builder()</span>
+<span class="fc" id="L90">                        .success(true)</span>
+<span class="fc" id="L91">                        .message(&quot;Users fetched successfully&quot;)</span>
+<span class="fc" id="L92">                        .data(response)</span>
+<span class="fc" id="L93">                        .build();</span>
+
+<span class="fc" id="L95">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    /**
+     * Retrieves a user by ID.
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;StandardAPIResponse&lt;UserResponseDTO&gt;&gt; getUserById(
+            @PathVariable Long id) {
+
+<span class="fc" id="L105">        log.info(&quot;Fetch user by ID request received: {}&quot;, id);</span>
+<span class="fc" id="L106">        UserResponseDTO response = userService.getUserById(id);</span>
+<span class="fc" id="L107">        log.info(&quot;Fetch user by ID request completed: {}&quot;, id);</span>
+
+        StandardAPIResponse&lt;UserResponseDTO&gt; apiResponse =
+<span class="fc" id="L110">                StandardAPIResponse.&lt;UserResponseDTO&gt;builder()</span>
+<span class="fc" id="L111">                        .success(true)</span>
+<span class="fc" id="L112">                        .message(&quot;User fetched successfully&quot;)</span>
+<span class="fc" id="L113">                        .data(response)</span>
+<span class="fc" id="L114">                        .build();</span>
+
+<span class="fc" id="L116">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    /**
+     * Assigns or clears the manager for an employee.
+     */
+    @PutMapping(&quot;/{employeeId}/manager&quot;)
+    public ResponseEntity&lt;StandardAPIResponse&lt;UserResponseDTO&gt;&gt; assignManager(
+            @PathVariable Long employeeId,
+            @RequestParam(required = false) Long managerId) {
+
+<span class="fc" id="L127">        log.info(&quot;Assign manager request received: employeeId={}, managerId={}&quot;, employeeId, managerId);</span>
+<span class="fc" id="L128">        UserResponseDTO response = userService.assignManager(employeeId, managerId);</span>
+<span class="fc" id="L129">        log.info(&quot;Assign manager request completed: employeeId={}, managerId={}&quot;, employeeId, managerId);</span>
+
+        StandardAPIResponse&lt;UserResponseDTO&gt; apiResponse =
+<span class="fc" id="L132">                StandardAPIResponse.&lt;UserResponseDTO&gt;builder()</span>
+<span class="fc" id="L133">                        .success(true)</span>
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">                        .message(managerId == null ? &quot;Manager cleared successfully&quot; : &quot;Manager assigned successfully&quot;)</span>
+<span class="fc" id="L135">                        .data(response)</span>
+<span class="fc" id="L136">                        .build();</span>
+
+<span class="fc" id="L138">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    /**
+     * Retrieves employees under a manager.
+     */
+    @GetMapping(&quot;/manager/{managerId}&quot;)
+    public ResponseEntity&lt;StandardAPIResponse&lt;List&lt;UserResponseDTO&gt;&gt;&gt; getEmployeesByManager(
+            @PathVariable Long managerId) {
+
+<span class="nc" id="L148">        log.info(&quot;Fetch employees by manager request received: managerId={}&quot;, managerId);</span>
+<span class="nc" id="L149">        List&lt;UserResponseDTO&gt; response = userService.getEmployeesByManager(managerId);</span>
+<span class="nc" id="L150">        log.info(&quot;Fetch employees by manager request completed: managerId={}, count={}&quot;,</span>
+<span class="nc" id="L151">                managerId, response.size());</span>
+
+        StandardAPIResponse&lt;List&lt;UserResponseDTO&gt;&gt; apiResponse =
+<span class="nc" id="L154">                StandardAPIResponse.&lt;List&lt;UserResponseDTO&gt;&gt;builder()</span>
+<span class="nc" id="L155">                        .success(true)</span>
+<span class="nc" id="L156">                        .message(&quot;Employees fetched successfully&quot;)</span>
+<span class="nc" id="L157">                        .data(response)</span>
+<span class="nc" id="L158">                        .build();</span>
+
+<span class="nc" id="L160">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    /**
+     * Deletes a user by ID.
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;StandardAPIResponse&lt;String&gt;&gt; deleteUser(@PathVariable Long id) {
+
+<span class="fc" id="L169">        log.warn(&quot;Delete user request received: {}&quot;, id);</span>
+<span class="fc" id="L170">        userService.deleteUser(id);</span>
+<span class="fc" id="L171">        log.warn(&quot;Delete user request completed: {}&quot;, id);</span>
+
+        StandardAPIResponse&lt;String&gt; apiResponse =
+<span class="fc" id="L174">                StandardAPIResponse.&lt;String&gt;builder()</span>
+<span class="fc" id="L175">                        .success(true)</span>
+<span class="fc" id="L176">                        .message(&quot;User deleted successfully&quot;)</span>
+<span class="fc" id="L177">                        .data(&quot;User deleted with id: &quot; + id)</span>
+<span class="fc" id="L178">                        .build();</span>
+
+<span class="fc" id="L180">        return ResponseEntity.ok(apiResponse);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

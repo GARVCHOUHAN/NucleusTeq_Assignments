@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.reimbursement.reimbursementportal.controller.AuthControllerTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.303 s -- in com.reimbursement.reimbursementportal.controller.AuthControllerTest

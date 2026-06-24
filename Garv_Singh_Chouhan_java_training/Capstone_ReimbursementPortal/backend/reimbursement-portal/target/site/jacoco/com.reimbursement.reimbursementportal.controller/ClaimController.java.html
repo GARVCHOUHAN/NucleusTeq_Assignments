@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClaimController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reimbursement-portal</a> &gt; <a href="index.source.html" class="el_package">com.reimbursement.reimbursementportal.controller</a> &gt; <span class="el_source">ClaimController.java</span></div><h1>ClaimController.java</h1><pre class="source lang-java linenums">package com.reimbursement.reimbursementportal.controller;
+
+import com.reimbursement.reimbursementportal.dto.request.ClaimActionRequestDTO;
+import com.reimbursement.reimbursementportal.dto.request.ClaimRequestDTO;
+import com.reimbursement.reimbursementportal.dto.response.ClaimResponseDTO;
+import com.reimbursement.reimbursementportal.dto.response.PageResponseDTO;
+import com.reimbursement.reimbursementportal.dto.StandardAPIResponse;
+import com.reimbursement.reimbursementportal.enums.ClaimStatus;
+import com.reimbursement.reimbursementportal.service.ClaimService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping(&quot;/api/claims&quot;)
+@RequiredArgsConstructor
+public class ClaimController {
+
+<span class="fc" id="L30">    private static final Logger log = LoggerFactory.getLogger(ClaimController.class);</span>
+
+    private final ClaimService claimService;
+
+    // ======================= SUBMIT CLAIM =======================
+    @PostMapping
+    public ResponseEntity&lt;StandardAPIResponse&lt;ClaimResponseDTO&gt;&gt; submitClaim(
+            @Valid @RequestBody ClaimRequestDTO request) {
+
+<span class="fc" id="L39">        log.info(&quot;Submit claim request received: employeeId={}, amount={}&quot;,</span>
+<span class="fc" id="L40">                request.getEmployeeId(), request.getAmount());</span>
+<span class="fc" id="L41">        ClaimResponseDTO response = claimService.submitClaim(request);</span>
+<span class="fc" id="L42">        log.info(&quot;Submit claim request completed: claimId={}&quot;, response.getId());</span>
+
+        StandardAPIResponse&lt;ClaimResponseDTO&gt; apiResponse =
+<span class="fc" id="L45">                StandardAPIResponse.&lt;ClaimResponseDTO&gt;builder()</span>
+<span class="fc" id="L46">                        .success(true)</span>
+<span class="fc" id="L47">                        .message(&quot;Claim submitted successfully&quot;)</span>
+<span class="fc" id="L48">                        .data(response)</span>
+<span class="fc" id="L49">                        .build();</span>
+
+<span class="fc" id="L51">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    // ========================= GET ALL CLAIMS =========================
+    @GetMapping
+    public ResponseEntity&lt;StandardAPIResponse&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt;&gt; getAllClaims(
+            @RequestParam(defaultValue = &quot;0&quot;) int page,
+            @RequestParam(defaultValue = &quot;10&quot;) int size) {
+
+<span class="fc" id="L60">        log.info(&quot;Fetch all claims request received: page={}, size={}&quot;, page, size);</span>
+<span class="fc" id="L61">        PageResponseDTO&lt;ClaimResponseDTO&gt; response = claimService.getAllClaims(page, size);</span>
+<span class="fc" id="L62">        log.info(&quot;Fetch all claims request completed: total={}&quot;, response.getTotalElements());</span>
+
+        StandardAPIResponse&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt; apiResponse =
+<span class="fc" id="L65">                StandardAPIResponse.&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt;builder()</span>
+<span class="fc" id="L66">                        .success(true)</span>
+<span class="fc" id="L67">                        .message(&quot;Claims fetched successfully&quot;)</span>
+<span class="fc" id="L68">                        .data(response)</span>
+<span class="fc" id="L69">                        .build();</span>
+
+<span class="fc" id="L71">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    // ========================= GET CLAIMS BY EMPLOYEE =========================
+    @GetMapping(&quot;/employee/{employeeId}&quot;)
+    public ResponseEntity&lt;StandardAPIResponse&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt;&gt; getClaimsByEmployee(
+            @PathVariable Long employeeId,
+            @RequestParam(defaultValue = &quot;0&quot;) int page,
+            @RequestParam(defaultValue = &quot;10&quot;) int size) {
+
+<span class="nc" id="L81">        log.info(&quot;Fetch claims by employee request received: employeeId={}&quot;, employeeId);</span>
+<span class="nc" id="L82">        PageResponseDTO&lt;ClaimResponseDTO&gt; response = claimService.getClaimsByEmployee(employeeId, page, size);</span>
+<span class="nc" id="L83">        log.info(&quot;Fetch claims by employee request completed: employeeId={}, total={}&quot;,</span>
+<span class="nc" id="L84">                employeeId, response.getTotalElements());</span>
+
+        StandardAPIResponse&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt; apiResponse =
+<span class="nc" id="L87">                StandardAPIResponse.&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt;builder()</span>
+<span class="nc" id="L88">                        .success(true)</span>
+<span class="nc" id="L89">                        .message(&quot;Employee claims fetched successfully&quot;)</span>
+<span class="nc" id="L90">                        .data(response)</span>
+<span class="nc" id="L91">                        .build();</span>
+
+<span class="nc" id="L93">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    // ========================= GET CLAIMS BY REVIEWER =========================
+    @GetMapping(&quot;/reviewer/{reviewerId}&quot;)
+    public ResponseEntity&lt;StandardAPIResponse&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt;&gt; getClaimsByReviewer(
+            @PathVariable Long reviewerId,
+            @RequestParam(defaultValue = &quot;0&quot;) int page,
+            @RequestParam(defaultValue = &quot;10&quot;) int size) {
+
+<span class="fc" id="L103">        log.info(&quot;Fetch claims by reviewer request received: reviewerId={}&quot;, reviewerId);</span>
+<span class="fc" id="L104">        PageResponseDTO&lt;ClaimResponseDTO&gt; response = claimService.getClaimsByReviewer(reviewerId, page, size);</span>
+<span class="fc" id="L105">        log.info(&quot;Fetch claims by reviewer request completed: reviewerId={}, total={}&quot;,</span>
+<span class="fc" id="L106">                reviewerId, response.getTotalElements());</span>
+
+        StandardAPIResponse&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt; apiResponse =
+<span class="fc" id="L109">                StandardAPIResponse.&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt;builder()</span>
+<span class="fc" id="L110">                        .success(true)</span>
+<span class="fc" id="L111">                        .message(&quot;Reviewer claims fetched successfully&quot;)</span>
+<span class="fc" id="L112">                        .data(response)</span>
+<span class="fc" id="L113">                        .build();</span>
+
+<span class="fc" id="L115">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    // ========================= GET CLAIMS BY STATUS =========================
+    @GetMapping(&quot;/status/{status}&quot;)
+    public ResponseEntity&lt;StandardAPIResponse&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt;&gt; getClaimsByStatus(
+            @PathVariable ClaimStatus status,
+            @RequestParam(defaultValue = &quot;0&quot;) int page,
+            @RequestParam(defaultValue = &quot;10&quot;) int size) {
+
+<span class="nc" id="L125">        log.info(&quot;Fetch claims by status request received: status={}&quot;, status);</span>
+<span class="nc" id="L126">        PageResponseDTO&lt;ClaimResponseDTO&gt; response = claimService.getClaimsByStatus(status, page, size);</span>
+<span class="nc" id="L127">        log.info(&quot;Fetch claims by status request completed: status={}, total={}&quot;,</span>
+<span class="nc" id="L128">                status, response.getTotalElements());</span>
+
+        StandardAPIResponse&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt; apiResponse =
+<span class="nc" id="L131">                StandardAPIResponse.&lt;PageResponseDTO&lt;ClaimResponseDTO&gt;&gt;builder()</span>
+<span class="nc" id="L132">                        .success(true)</span>
+<span class="nc" id="L133">                        .message(&quot;Claims fetched by status successfully&quot;)</span>
+<span class="nc" id="L134">                        .data(response)</span>
+<span class="nc" id="L135">                        .build();</span>
+
+<span class="nc" id="L137">        return ResponseEntity.ok(apiResponse);</span>
+    }
+
+    // ========================= TAKE ACTION =========================
+    @PutMapping(&quot;/{claimId}/action/{reviewerId}&quot;)
+    public ResponseEntity&lt;StandardAPIResponse&lt;ClaimResponseDTO&gt;&gt; takeAction(
+            @PathVariable Long claimId,
+            @PathVariable Long reviewerId,
+            @Valid @RequestBody ClaimActionRequestDTO request) {
+
+<span class="fc" id="L147">        log.info(&quot;Claim status update request received: claimId={}, reviewerId={}, status={}&quot;,</span>
+<span class="fc" id="L148">                claimId, reviewerId, request.getStatus());</span>
+<span class="fc" id="L149">        ClaimResponseDTO response = claimService.takeAction(claimId, reviewerId, request);</span>
+<span class="fc" id="L150">        log.info(&quot;Claim status update request completed: claimId={}, status={}&quot;,</span>
+<span class="fc" id="L151">                claimId, response.getStatus());</span>
+
+        StandardAPIResponse&lt;ClaimResponseDTO&gt; apiResponse =
+<span class="fc" id="L154">                StandardAPIResponse.&lt;ClaimResponseDTO&gt;builder()</span>
+<span class="fc" id="L155">                        .success(true)</span>
+<span class="fc" id="L156">                        .message(&quot;Claim updated successfully&quot;)</span>
+<span class="fc" id="L157">                        .data(response)</span>
+<span class="fc" id="L158">                        .build();</span>
+
+<span class="fc" id="L160">        return ResponseEntity.ok(apiResponse);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

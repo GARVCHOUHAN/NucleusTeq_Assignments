@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reimbursement-portal</a> &gt; <a href="index.source.html" class="el_package">com.reimbursement.reimbursementportal.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.reimbursement.reimbursementportal.exception;
+
+import com.reimbursement.reimbursementportal.dto.StandardAPIResponse;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.stream.Collectors;
+
+@RestControllerAdvice
+<span class="fc" id="L18">public class GlobalExceptionHandler {</span>
+<span class="fc" id="L19">    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);</span>
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleBadRequest(BadRequestException ex) {
+<span class="fc" id="L23">        log.error(&quot;Exception occurred: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L24">        return ResponseEntity.badRequest().body(</span>
+<span class="fc" id="L25">                StandardAPIResponse.builder()</span>
+<span class="fc" id="L26">                        .success(false)</span>
+<span class="fc" id="L27">                        .message(ex.getMessage())</span>
+<span class="fc" id="L28">                        .data(null)</span>
+<span class="fc" id="L29">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleNotFound(ResourceNotFoundException ex) {
+<span class="nc" id="L35">        log.error(&quot;Exception occurred: {}&quot;, ex.getMessage(), ex);</span>
+<span class="nc" id="L36">        return ResponseEntity.status(404).body(</span>
+<span class="nc" id="L37">                StandardAPIResponse.builder()</span>
+<span class="nc" id="L38">                        .success(false)</span>
+<span class="nc" id="L39">                        .message(ex.getMessage())</span>
+<span class="nc" id="L40">                        .data(null)</span>
+<span class="nc" id="L41">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleUserNotFound(UserNotFoundException ex) {
+<span class="fc" id="L47">        log.error(&quot;Exception occurred: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L48">        return ResponseEntity.status(404).body(</span>
+<span class="fc" id="L49">                StandardAPIResponse.builder()</span>
+<span class="fc" id="L50">                        .success(false)</span>
+<span class="fc" id="L51">                        .message(ex.getMessage())</span>
+<span class="fc" id="L52">                        .data(null)</span>
+<span class="fc" id="L53">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(ClaimNotFoundException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleClaimNotFound(ClaimNotFoundException ex) {
+<span class="fc" id="L59">        log.error(&quot;Exception occurred: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L60">        return ResponseEntity.status(404).body(</span>
+<span class="fc" id="L61">                StandardAPIResponse.builder()</span>
+<span class="fc" id="L62">                        .success(false)</span>
+<span class="fc" id="L63">                        .message(ex.getMessage())</span>
+<span class="fc" id="L64">                        .data(null)</span>
+<span class="fc" id="L65">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleBusinessValidation(ValidationException ex) {
+<span class="fc" id="L71">        log.error(&quot;Exception occurred: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L72">        return ResponseEntity.badRequest().body(</span>
+<span class="fc" id="L73">                StandardAPIResponse.builder()</span>
+<span class="fc" id="L74">                        .success(false)</span>
+<span class="fc" id="L75">                        .message(ex.getMessage())</span>
+<span class="fc" id="L76">                        .data(null)</span>
+<span class="fc" id="L77">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleDataIntegrity(DataIntegrityViolationException ex) {
+<span class="nc" id="L83">        log.error(&quot;Database operation failed {}&quot;, ex.getMessage(), ex);</span>
+<span class="nc" id="L84">        return ResponseEntity.badRequest().body(</span>
+<span class="nc" id="L85">                StandardAPIResponse.builder()</span>
+<span class="nc" id="L86">                        .success(false)</span>
+<span class="nc" id="L87">                        .message(&quot;Cannot delete this user because they have existing claims in the system. Please delete their claims first.&quot;)</span>
+<span class="nc" id="L88">                        .data(null)</span>
+<span class="nc" id="L89">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleValidation(MethodArgumentNotValidException ex) {
+<span class="fc" id="L95">        String message = ex.getBindingResult().getFieldErrors().stream()</span>
+<span class="fc" id="L96">                .map(FieldError::getDefaultMessage)</span>
+<span class="fc" id="L97">                .collect(Collectors.joining(&quot;, &quot;));</span>
+
+<span class="fc" id="L99">        log.error(&quot;Exception occurred: {}&quot;, message, ex);</span>
+<span class="fc" id="L100">        return ResponseEntity.badRequest().body(</span>
+<span class="fc" id="L101">                StandardAPIResponse.builder()</span>
+<span class="fc" id="L102">                        .success(false)</span>
+<span class="fc" id="L103">                        .message(message)</span>
+<span class="fc" id="L104">                        .data(null)</span>
+<span class="fc" id="L105">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleBadCredentials(BadCredentialsException ex) {
+<span class="fc" id="L111">        log.warn(&quot;Invalid credentials: {}&quot;, ex.getMessage());</span>
+<span class="fc" id="L112">        return ResponseEntity.status(401).body(</span>
+<span class="fc" id="L113">                StandardAPIResponse.builder()</span>
+<span class="fc" id="L114">                        .success(false)</span>
+<span class="fc" id="L115">                        .message(&quot;Invalid email or password&quot;)</span>
+<span class="fc" id="L116">                        .data(null)</span>
+<span class="fc" id="L117">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleAccessDenied(AccessDeniedException ex) {
+<span class="fc" id="L123">        log.warn(&quot;Unauthorized access detected: {}&quot;, ex.getMessage());</span>
+<span class="fc" id="L124">        return ResponseEntity.status(403).body(</span>
+<span class="fc" id="L125">                StandardAPIResponse.builder()</span>
+<span class="fc" id="L126">                        .success(false)</span>
+<span class="fc" id="L127">                        .message(&quot;You do not have permission to perform this action&quot;)</span>
+<span class="fc" id="L128">                        .data(null)</span>
+<span class="fc" id="L129">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleRuntime(RuntimeException ex) {
+<span class="fc" id="L135">        log.error(&quot;Exception occurred: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L136">        return ResponseEntity.internalServerError().body(</span>
+<span class="fc" id="L137">                StandardAPIResponse.builder()</span>
+<span class="fc" id="L138">                        .success(false)</span>
+<span class="fc" id="L139">                        .message(&quot;Something went wrong: &quot; + ex.getMessage())</span>
+<span class="fc" id="L140">                        .data(null)</span>
+<span class="fc" id="L141">                        .build()</span>
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;StandardAPIResponse&lt;Object&gt;&gt; handleGeneric(Exception ex) {
+<span class="fc" id="L147">        log.error(&quot;Exception occurred: {}&quot;, ex.getMessage(), ex);</span>
+<span class="fc" id="L148">        return ResponseEntity.internalServerError().body(</span>
+<span class="fc" id="L149">                StandardAPIResponse.builder()</span>
+<span class="fc" id="L150">                        .success(false)</span>
+<span class="fc" id="L151">                        .message(&quot;Something went wrong: &quot; + ex.getMessage())</span>
+<span class="fc" id="L152">                        .data(null)</span>
+<span class="fc" id="L153">                        .build()</span>
+        );
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

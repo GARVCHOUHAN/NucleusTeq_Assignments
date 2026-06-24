@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Claim.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reimbursement-portal</a> &gt; <a href="index.source.html" class="el_package">com.reimbursement.reimbursementportal.entity</a> &gt; <span class="el_source">Claim.java</span></div><h1>Claim.java</h1><pre class="source lang-java linenums">
+package com.reimbursement.reimbursementportal.entity;
+
+import com.reimbursement.reimbursementportal.enums.ClaimStatus;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+/**
+ * Represents a reimbursement claim submitted by an employee.
+ */
+@Entity
+@Table(name = &quot;claims&quot;)
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+
+public class Claim {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, precision = 12, scale = 2)
+    private BigDecimal amount;
+
+    @Column(nullable = false)
+    private LocalDate claimDate;
+
+    @Column(nullable = false, length = 500)
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ClaimStatus status;
+
+    @Column(length = 500)
+    private String reviewerComment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;employee_id&quot;, nullable = false)
+    private User employee;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;reviewer_id&quot;)
+    private User reviewer;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    public void setDate(LocalDate now) {
+<span class="fc" id="L77">        this.claimDate = now;</span>
+<span class="fc" id="L78">    }</span>
+
+    public void setComment(@Size(max = 500, message = &quot;Comment must not exceed 500 characters&quot;) String comment) {
+<span class="pc bpc" id="L81" title="1 of 4 branches missed.">        this.reviewerComment = (comment == null || comment.isBlank()) ? null : comment.trim();</span>
+<span class="fc" id="L82">    }</span>
+
+    public LocalDate getDate() {
+<span class="fc" id="L85">        return this.claimDate;</span>
+    }
+
+    public String getComment() {
+<span class="fc" id="L89">        return this.reviewerComment;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

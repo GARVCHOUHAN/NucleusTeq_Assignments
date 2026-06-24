@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reimbursement-portal</a> &gt; <a href="index.source.html" class="el_package">com.reimbursement.reimbursementportal.service.serviceImpl</a> &gt; <span class="el_source">UserServiceImpl.java</span></div><h1>UserServiceImpl.java</h1><pre class="source lang-java linenums">package com.reimbursement.reimbursementportal.service.serviceImpl;
+
+import com.reimbursement.reimbursementportal.dto.request.UserRequestDTO;
+import com.reimbursement.reimbursementportal.dto.response.UserResponseDTO;
+import com.reimbursement.reimbursementportal.entity.Claim;
+import com.reimbursement.reimbursementportal.enums.Role;
+import com.reimbursement.reimbursementportal.entity.User;
+import com.reimbursement.reimbursementportal.enums.ClaimStatus;
+import com.reimbursement.reimbursementportal.exception.BadRequestException;
+import com.reimbursement.reimbursementportal.repository.ClaimRepository;
+import com.reimbursement.reimbursementportal.repository.UserRepository;
+import com.reimbursement.reimbursementportal.service.UserService;
+import com.reimbursement.reimbursementportal.util.ValidationUtil;
+import com.reimbursement.reimbursementportal.mapper.UserMapper;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final ClaimRepository claimRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+<span class="fc" id="L32">    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);</span>
+
+    // ========================= CREATE USER =========================
+    @Override
+    public UserResponseDTO createUser(UserRequestDTO request) {
+
+<span class="fc" id="L38">        log.info(&quot;Creating user: {}&quot;, request.getEmail());</span>
+
+        // 1. Validate email domain
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (!ValidationUtil.isValidCompanyEmail(request.getEmail())) {</span>
+<span class="fc" id="L42">            log.warn(&quot;Failed to create user {}: invalid company email&quot;, request.getEmail());</span>
+<span class="fc" id="L43">            throw new BadRequestException(&quot;Email must be @company.com&quot;);</span>
+        }
+
+        // 2. Check duplicate email
+<span class="fc" id="L47">        log.info(&quot;Checking duplicate email before save: {}&quot;, request.getEmail());</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        if (userRepository.existsByEmail(request.getEmail())) {</span>
+<span class="nc" id="L49">            log.warn(&quot;Failed to create user {}: duplicate email&quot;, request.getEmail());</span>
+<span class="nc" id="L50">            throw new BadRequestException(&quot;Email already exists&quot;);</span>
+        }
+
+        // 3. Encrypt password
+<span class="fc" id="L54">        String encryptedPassword = passwordEncoder.encode(request.getPassword());</span>
+
+        // 4. Create user entity FIRST
+<span class="fc" id="L57">        User user = UserMapper.toEntity(request, encryptedPassword);</span>
+
+        // 5. Assign manager ONLY if provided (optional for EMPLOYEE)
+<span class="pc bpc" id="L60" title="2 of 4 branches missed.">        if (request.getRole() == Role.EMPLOYEE &amp;&amp; request.getManagerId() != null) {</span>
+
+<span class="fc" id="L62">            User manager = userRepository.findById(request.getManagerId())</span>
+<span class="fc" id="L63">                    .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L64">                        log.warn(&quot;Failed to assign manager during create: managerId={}&quot;, request.getManagerId());</span>
+<span class="nc" id="L65">                        return new BadRequestException(&quot;Manager not found&quot;);</span>
+                    });
+
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">            if (manager.getRole() != Role.MANAGER) {</span>
+<span class="nc" id="L69">                log.warn(&quot;Invalid manager role during user create: managerId={}&quot;, request.getManagerId());</span>
+<span class="nc" id="L70">                throw new BadRequestException(&quot;Assigned manager must have MANAGER role&quot;);</span>
+            }
+
+<span class="fc" id="L73">            user.setManager(manager);</span>
+        }
+
+        // 6. Save user
+<span class="fc" id="L77">        log.info(&quot;Saving user: {}&quot;, request.getEmail());</span>
+<span class="fc" id="L78">        User savedUser = userRepository.save(user);</span>
+
+<span class="fc" id="L80">        log.info(&quot;User created: {}&quot;, savedUser.getEmail());</span>
+<span class="fc" id="L81">        return UserMapper.toResponse(savedUser);</span>
+    }
+
+    // ========================= GET ALL USERS =========================
+    @Override
+    public List&lt;UserResponseDTO&gt; getAllUsers() {
+<span class="fc" id="L87">        log.info(&quot;Fetching all users&quot;);</span>
+<span class="fc" id="L88">        return userRepository.findAll()</span>
+<span class="fc" id="L89">                .stream()</span>
+<span class="fc" id="L90">                .map(UserMapper::toResponse)</span>
+<span class="fc" id="L91">                .toList();</span>
+    }
+
+    // ========================= GET USER BY ID =========================
+    @Override
+    public UserResponseDTO getUserById(Long id) {
+<span class="fc" id="L97">        log.info(&quot;Fetching user by ID: {}&quot;, id);</span>
+<span class="fc" id="L98">        User user = userRepository.findById(id)</span>
+<span class="fc" id="L99">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L100">                    log.warn(&quot;User not found with ID: {}&quot;, id);</span>
+<span class="nc" id="L101">                    return new BadRequestException(&quot;User not found with ID: &quot; + id);</span>
+                });
+
+<span class="fc" id="L104">        return UserMapper.toResponse(user);</span>
+    }
+
+    // ========================= ASSIGN MANAGER =========================
+    @Override
+    public UserResponseDTO assignManager(Long employeeId, Long managerId) {
+<span class="fc" id="L110">        log.info(&quot;Assigning manager: employeeId={}, managerId={}&quot;, employeeId, managerId);</span>
+<span class="fc" id="L111">        User employee = userRepository.findById(employeeId)</span>
+<span class="fc" id="L112">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L113">                    log.warn(&quot;Employee not found for manager assignment: employeeId={}&quot;, employeeId);</span>
+<span class="nc" id="L114">                    return new BadRequestException(&quot;Employee not found with ID: &quot; + employeeId);</span>
+                });
+
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        if (employee.getRole() != Role.EMPLOYEE) {</span>
+<span class="nc" id="L118">            log.warn(&quot;Invalid manager assignment target role: employeeId={}, role={}&quot;, employeeId, employee.getRole());</span>
+<span class="nc" id="L119">            throw new BadRequestException(&quot;Manager can be assigned only to EMPLOYEE users&quot;);</span>
+        }
+
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        if (managerId == null) {</span>
+<span class="fc" id="L123">            employee.setManager(null);</span>
+<span class="fc" id="L124">            User savedEmployee = userRepository.save(employee);</span>
+<span class="fc" id="L125">            reassignSubmittedClaims(savedEmployee, resolveFallbackAdmin());</span>
+<span class="fc" id="L126">            log.info(&quot;Manager cleared for employeeId: {}&quot;, employeeId);</span>
+<span class="fc" id="L127">            return UserMapper.toResponse(savedEmployee);</span>
+        }
+
+<span class="fc" id="L130">        User manager = userRepository.findById(managerId)</span>
+<span class="fc" id="L131">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L132">                    log.warn(&quot;Manager not found for assignment: managerId={}&quot;, managerId);</span>
+<span class="nc" id="L133">                    return new BadRequestException(&quot;Manager not found with ID: &quot; + managerId);</span>
+                });
+
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        if (manager.getRole() != Role.MANAGER) {</span>
+<span class="nc" id="L137">            log.warn(&quot;Invalid role for assigned manager: managerId={}, role={}&quot;, managerId, manager.getRole());</span>
+<span class="nc" id="L138">            throw new BadRequestException(&quot;Assigned manager must have MANAGER role&quot;);</span>
+        }
+
+<span class="fc" id="L141">        employee.setManager(manager);</span>
+<span class="fc" id="L142">        User savedEmployee = userRepository.save(employee);</span>
+<span class="fc" id="L143">        reassignSubmittedClaims(savedEmployee, manager);</span>
+<span class="fc" id="L144">        log.info(&quot;Manager assigned: employeeId={}, managerId={}&quot;, employeeId, managerId);</span>
+<span class="fc" id="L145">        return UserMapper.toResponse(savedEmployee);</span>
+    }
+
+    // ========================= GET EMPLOYEES UNDER MANAGER =========================
+    @Override
+    public List&lt;UserResponseDTO&gt; getEmployeesByManager(Long managerId) {
+
+<span class="fc" id="L152">        log.info(&quot;Fetching employees for manager: {}&quot;, managerId);</span>
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">        if (!userRepository.existsById(managerId)) {</span>
+<span class="nc" id="L154">            log.warn(&quot;Manager not found while fetching employees: {}&quot;, managerId);</span>
+<span class="nc" id="L155">            throw new BadRequestException(&quot;Manager not found with ID: &quot; + managerId);</span>
+        }
+
+<span class="fc" id="L158">        return userRepository.findByManagerId(managerId)</span>
+<span class="fc" id="L159">                .stream()</span>
+<span class="fc" id="L160">                .map(UserMapper::toResponse)</span>
+<span class="fc" id="L161">                .toList();</span>
+
+
+    }
+
+    // ========================= DELETE USER =========================
+    @Override
+    public void deleteUser(Long id) {
+
+<span class="fc" id="L170">        log.warn(&quot;Deleting user: {}&quot;, id);</span>
+<span class="fc" id="L171">        User user = userRepository.findById(id)</span>
+<span class="fc" id="L172">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L173">                    log.warn(&quot;User not found for delete: {}&quot;, id);</span>
+<span class="nc" id="L174">                    return new BadRequestException(&quot;User not found with ID: &quot; + id);</span>
+                });
+
+<span class="fc bfc" id="L177" title="All 2 branches covered.">        if (userRepository.existsByManagerId(id)) {</span>
+<span class="fc" id="L178">            log.warn(&quot;Cannot delete manager with assigned employees: {}&quot;, id);</span>
+<span class="fc" id="L179">            throw new BadRequestException(&quot;Cannot delete manager with assigned employees&quot;);</span>
+        }
+
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">        if (user.getRole() == Role.MANAGER) {</span>
+<span class="fc" id="L183">            reassignClaimsForDeletedReviewer(user, resolveFallbackAdmin());</span>
+        }
+
+<span class="fc" id="L186">        log.warn(&quot;User deleted with id: {}&quot;, id);</span>
+<span class="fc" id="L187">        userRepository.delete(user);</span>
+<span class="fc" id="L188">    }</span>
+
+    private void reassignSubmittedClaims(User employee, User reviewer) {
+<span class="fc" id="L191">        List&lt;Claim&gt; submittedClaims = claimRepository.findByEmployeeIdAndStatus(</span>
+<span class="fc" id="L192">                employee.getId(), ClaimStatus.SUBMITTED);</span>
+
+<span class="fc" id="L194">        submittedClaims.forEach(claim -&gt; claim.setReviewer(reviewer));</span>
+<span class="fc" id="L195">        claimRepository.saveAll(submittedClaims);</span>
+
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">        if (!submittedClaims.isEmpty()) {</span>
+<span class="fc" id="L198">            log.info(&quot;Reassigned {} submitted claim(s) for employeeId={} to reviewerId={}&quot;,</span>
+<span class="fc" id="L199">                    submittedClaims.size(), employee.getId(), reviewer.getId());</span>
+        }
+<span class="fc" id="L201">    }</span>
+
+    private void reassignClaimsForDeletedReviewer(User deletedReviewer, User fallbackReviewer) {
+<span class="fc" id="L204">        List&lt;Claim&gt; assignedClaims = claimRepository.findByReviewerId(deletedReviewer.getId());</span>
+
+<span class="fc" id="L206">        assignedClaims.forEach(claim -&gt; claim.setReviewer(fallbackReviewer));</span>
+<span class="fc" id="L207">        claimRepository.saveAll(assignedClaims);</span>
+
+<span class="pc bpc" id="L209" title="1 of 2 branches missed.">        if (!assignedClaims.isEmpty()) {</span>
+<span class="fc" id="L210">            log.info(&quot;Reassigned {} claim(s) from deleted reviewerId={} to admin reviewerId={}&quot;,</span>
+<span class="fc" id="L211">                    assignedClaims.size(), deletedReviewer.getId(), fallbackReviewer.getId());</span>
+        }
+<span class="fc" id="L213">    }</span>
+
+    private User resolveFallbackAdmin() {
+<span class="fc" id="L216">        return userRepository.findByRole(Role.ADMIN)</span>
+<span class="fc" id="L217">                .stream()</span>
+<span class="fc" id="L218">                .findFirst()</span>
+<span class="fc" id="L219">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L220">                    log.error(&quot;Database operation failed: no admin available for fallback reviewer&quot;);</span>
+<span class="nc" id="L221">                    return new BadRequestException(&quot;No admin available to act as fallback reviewer&quot;);</span>
+                });
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

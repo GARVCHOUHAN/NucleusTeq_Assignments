@@ -1,0 +1,14 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+todo-application,com.garv.todo.mapper,TodoMapper,0,34,0,2,0,9,0,4,0,3
+todo-application,com.garv.todo.dto,TodoResponseDTO,0,56,0,0,0,24,0,12,0,12
+todo-application,com.garv.todo.dto,TodoDTO,0,36,0,0,0,16,0,8,0,8
+todo-application,com.garv.todo.dto,ErrorResponse,0,66,0,0,0,28,0,14,0,14
+todo-application,com.garv.todo.service,NotificationServiceClient,0,15,0,0,0,4,0,3,0,3
+todo-application,com.garv.todo.service,TodoService,1,195,3,13,1,44,3,15,0,10
+todo-application,com.garv.todo.controller,TodoController,0,82,0,0,0,20,0,7,0,7
+todo-application,com.garv.todo.exception,ResourceNotFoundException,0,4,0,0,0,2,0,1,0,1
+todo-application,com.garv.todo.exception,GlobalExceptionHandler,8,72,0,0,2,15,1,7,1,7
+todo-application,com.garv.todo.exception,InvalidStatusTransitionException,0,4,0,0,0,2,0,1,0,1
+todo-application,com.garv.todo,TodoApplication,5,3,0,0,2,1,1,1,1,1
+todo-application,com.garv.todo.entity,Todo,0,63,0,4,0,27,0,15,0,13
+todo-application,com.garv.todo.entity,TodoStatus,0,15,0,0,0,3,0,1,0,1

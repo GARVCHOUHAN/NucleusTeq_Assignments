@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClaimServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">reimbursement-portal</a> &gt; <a href="index.source.html" class="el_package">com.reimbursement.reimbursementportal.service.serviceImpl</a> &gt; <span class="el_source">ClaimServiceImpl.java</span></div><h1>ClaimServiceImpl.java</h1><pre class="source lang-java linenums">package com.reimbursement.reimbursementportal.service.serviceImpl;
+import com.reimbursement.reimbursementportal.dto.request.ClaimActionRequestDTO;
+import com.reimbursement.reimbursementportal.dto.request.ClaimRequestDTO;
+import com.reimbursement.reimbursementportal.dto.response.ClaimResponseDTO;
+import com.reimbursement.reimbursementportal.dto.response.PageResponseDTO;
+import com.reimbursement.reimbursementportal.entity.Claim;
+import com.reimbursement.reimbursementportal.entity.User;
+import com.reimbursement.reimbursementportal.enums.ClaimStatus;
+import com.reimbursement.reimbursementportal.enums.Role;
+import com.reimbursement.reimbursementportal.exception.BadRequestException;
+import com.reimbursement.reimbursementportal.exception.ResourceNotFoundException;
+import com.reimbursement.reimbursementportal.mapper.ClaimMapper;
+import com.reimbursement.reimbursementportal.repository.ClaimRepository;
+import com.reimbursement.reimbursementportal.repository.UserRepository;
+import com.reimbursement.reimbursementportal.service.ClaimService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+
+@Service
+@RequiredArgsConstructor
+public class ClaimServiceImpl implements ClaimService {
+
+    private final ClaimRepository claimRepository;
+    private final UserRepository userRepository;
+<span class="fc" id="L34">    private static final Logger log = LoggerFactory.getLogger(ClaimServiceImpl.class);</span>
+<span class="fc" id="L35">    private static final BigDecimal MAX_CLAIM_AMOUNT = BigDecimal.valueOf(100000);</span>
+    private static final int MAX_PAGE_SIZE = 100;
+
+    // ========================= SUBMIT CLAIM =========================
+    @Override
+    public ClaimResponseDTO submitClaim(ClaimRequestDTO request) {
+
+<span class="fc" id="L42">        log.info(&quot;Claim submission started: employeeId={}, amount={}&quot;,</span>
+<span class="fc" id="L43">                request.getEmployeeId(), request.getAmount());</span>
+
+<span class="pc bpc" id="L45" title="2 of 4 branches missed.">        if (request.getAmount() == null || request.getAmount() &lt;= 0) {</span>
+<span class="nc" id="L46">            log.warn(&quot;Invalid claim request by employee {}: amount={}&quot;,</span>
+<span class="nc" id="L47">                    request.getEmployeeId(), request.getAmount());</span>
+<span class="nc" id="L48">            throw new BadRequestException(&quot;Amount must be greater than 0&quot;);</span>
+        }
+
+<span class="fc" id="L51">        BigDecimal amount = BigDecimal.valueOf(request.getAmount());</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (amount.compareTo(MAX_CLAIM_AMOUNT) &gt; 0) {</span>
+<span class="fc" id="L53">            log.warn(&quot;Invalid claim request by employee {}: amount exceeds limit&quot;,</span>
+<span class="fc" id="L54">                    request.getEmployeeId());</span>
+<span class="fc" id="L55">            throw new BadRequestException(&quot;Amount must not exceed 100000&quot;);</span>
+        }
+
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if (request.getClaimDate() == null) {</span>
+<span class="nc" id="L59">            log.warn(&quot;Invalid claim request by employee {}: missing claim date&quot;,</span>
+<span class="nc" id="L60">                    request.getEmployeeId());</span>
+<span class="nc" id="L61">            throw new BadRequestException(&quot;Claim date is required&quot;);</span>
+        }
+
+<span class="pc bpc" id="L64" title="2 of 4 branches missed.">        if (request.getDescription() == null || request.getDescription().isBlank()) {</span>
+<span class="nc" id="L65">            log.warn(&quot;Invalid claim request by employee {}: missing description&quot;,</span>
+<span class="nc" id="L66">                    request.getEmployeeId());</span>
+<span class="nc" id="L67">            throw new BadRequestException(&quot;Description is required&quot;);</span>
+        }
+
+<span class="fc" id="L70">        log.info(&quot;Fetching employee for claim submission: {}&quot;, request.getEmployeeId());</span>
+<span class="fc" id="L71">        User employee = userRepository.findById(request.getEmployeeId())</span>
+<span class="fc" id="L72">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L73">                    log.warn(&quot;Invalid claim request by employee {}: employee not found&quot;,</span>
+<span class="nc" id="L74">                            request.getEmployeeId());</span>
+<span class="nc" id="L75">                    return new BadRequestException(&quot;Employee not found with id: &quot; + request.getEmployeeId());</span>
+                });
+
+        // Assign reviewer: manager if assigned, else fallback to Admin
+<span class="fc" id="L79">        User reviewer = resolveReviewer(employee);</span>
+
+<span class="fc" id="L81">        Claim claim = new Claim();</span>
+<span class="fc" id="L82">        claim.setAmount(amount);</span>
+<span class="fc" id="L83">        claim.setDescription(request.getDescription());</span>
+<span class="fc" id="L84">        claim.setDate(request.getClaimDate());</span>
+<span class="fc" id="L85">        claim.setStatus(ClaimStatus.SUBMITTED);</span>
+<span class="fc" id="L86">        claim.setEmployee(employee);</span>
+<span class="fc" id="L87">        claim.setReviewer(reviewer);</span>
+
+<span class="fc" id="L89">        log.info(&quot;Saving claim for employee {} amount {}&quot;, request.getEmployeeId(), amount);</span>
+<span class="fc" id="L90">        Claim savedClaim = claimRepository.save(claim);</span>
+<span class="fc" id="L91">        log.info(&quot;Claim submitted by employee {} amount {}&quot;, request.getEmployeeId(), amount);</span>
+<span class="fc" id="L92">        return ClaimMapper.toResponse(savedClaim);</span>
+
+    }
+
+    // ========================= GET ALL CLAIMS =========================
+    @Override
+    public PageResponseDTO&lt;ClaimResponseDTO&gt; getAllClaims(int page, int size) {
+<span class="fc" id="L99">        log.info(&quot;Fetching all claims: page={}, size={}&quot;, page, size);</span>
+<span class="fc" id="L100">        return toPageResponse(claimRepository.findAll(pageable(page, size)));</span>
+    }
+
+    // ========================= GET CLAIMS BY EMPLOYEE =========================
+    @Override
+    public PageResponseDTO&lt;ClaimResponseDTO&gt; getClaimsByEmployee(Long employeeId, int page, int size) {
+
+<span class="fc" id="L107">        log.info(&quot;Fetching claims for employee {}&quot;, employeeId);</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (!userRepository.existsById(employeeId)) {</span>
+<span class="fc" id="L109">            log.warn(&quot;Invalid claim retrieval: employee not found {}&quot;, employeeId);</span>
+<span class="fc" id="L110">            throw new BadRequestException(&quot;Employee not found&quot;);</span>
+        }
+
+<span class="nc" id="L113">        return toPageResponse(claimRepository.findByEmployeeId(employeeId, pageable(page, size)));</span>
+    }
+
+    // ========================= GET CLAIMS BY REVIEWER =========================
+    @Override
+    public PageResponseDTO&lt;ClaimResponseDTO&gt; getClaimsByReviewer(Long reviewerId, int page, int size) {
+
+<span class="fc" id="L120">        log.info(&quot;Fetching claims for reviewer {}&quot;, reviewerId);</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (!userRepository.existsById(reviewerId)) {</span>
+<span class="nc" id="L122">            log.warn(&quot;Invalid claim retrieval: reviewer not found {}&quot;, reviewerId);</span>
+<span class="nc" id="L123">            throw new BadRequestException(&quot;Reviewer not found&quot;);</span>
+        }
+
+<span class="fc" id="L126">        return toPageResponse(claimRepository.findByReviewerId(reviewerId, pageable(page, size)));</span>
+    }
+
+    // ========================= GET CLAIMS BY STATUS =========================
+    @Override
+    public PageResponseDTO&lt;ClaimResponseDTO&gt; getClaimsByStatus(ClaimStatus status, int page, int size) {
+<span class="fc" id="L132">        log.info(&quot;Fetching claims by status {}&quot;, status);</span>
+<span class="fc" id="L133">        return toPageResponse(claimRepository.findByStatus(status, pageable(page, size)));</span>
+    }
+
+    // ========================= TAKE ACTION =========================
+    @Override
+    public ClaimResponseDTO takeAction(Long claimId, Long reviewerId, ClaimActionRequestDTO request) {
+
+<span class="fc" id="L140">        log.info(&quot;Processing claim: claimId={}, reviewerId={}, status={}&quot;,</span>
+<span class="fc" id="L141">                claimId, reviewerId, request.getStatus());</span>
+<span class="fc" id="L142">        Claim claim = claimRepository.findById(claimId)</span>
+<span class="fc" id="L143">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L144">                    log.warn(&quot;Invalid claim action: claim not found {}&quot;, claimId);</span>
+<span class="nc" id="L145">                    return new ResourceNotFoundException(&quot;Claim not found&quot;);</span>
+                });
+
+<span class="fc" id="L148">        User reviewer = userRepository.findById(reviewerId)</span>
+<span class="fc" id="L149">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L150">                    log.warn(&quot;Invalid claim action: reviewer not found {}&quot;, reviewerId);</span>
+<span class="nc" id="L151">                    return new ResourceNotFoundException(&quot;Reviewer not found&quot;);</span>
+                });
+
+        // Claim must still be SUBMITTED to be actioned
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        if (claim.getStatus() != ClaimStatus.SUBMITTED) {</span>
+<span class="fc" id="L156">            log.warn(&quot;Invalid claim action: claimId={} already status={}&quot;, claimId, claim.getStatus());</span>
+<span class="fc" id="L157">            throw new BadRequestException(&quot;Claim has already been processed&quot;);</span>
+        }
+
+        // Only the assigned reviewer can approve or reject a claim.
+        // For admin fallback claims, any admin can complete the review.
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        boolean isAssignedReviewer = claim.getReviewer() != null &amp;&amp;</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">                claim.getReviewer().getId().equals(reviewerId);</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        boolean isAdminFallbackClaim = reviewer.getRole() == Role.ADMIN &amp;&amp;</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">                claim.getReviewer() != null &amp;&amp;</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">                claim.getReviewer().getRole() == Role.ADMIN;</span>
+
+<span class="pc bpc" id="L168" title="1 of 4 branches missed.">        if (!isAssignedReviewer &amp;&amp; !isAdminFallbackClaim) {</span>
+<span class="fc" id="L169">            log.warn(&quot;Unauthorized claim action: claimId={}, reviewerId={}&quot;, claimId, reviewerId);</span>
+<span class="fc" id="L170">            throw new BadRequestException(&quot;You are not authorized to take action on this claim&quot;);</span>
+        }
+
+        // Cannot set status back to SUBMITTED
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        if (request.getStatus() == ClaimStatus.SUBMITTED) {</span>
+<span class="fc" id="L175">            log.warn(&quot;Invalid claim status update: claimId={} requested SUBMITTED&quot;, claimId);</span>
+<span class="fc" id="L176">            throw new BadRequestException(&quot;Invalid action - cannot set status to SUBMITTED&quot;);</span>
+        }
+
+        // Comment is mandatory for rejection
+<span class="fc bfc" id="L180" title="All 2 branches covered.">        if (request.getStatus() == ClaimStatus.REJECTED &amp;&amp;</span>
+<span class="pc bpc" id="L181" title="2 of 4 branches missed.">                (request.getComment() == null || request.getComment().isBlank())) {</span>
+<span class="fc" id="L182">            log.warn(&quot;Invalid claim rejection: claimId={} missing comment&quot;, claimId);</span>
+<span class="fc" id="L183">            throw new BadRequestException(&quot;A comment is required when rejecting a claim&quot;);</span>
+        }
+
+<span class="fc" id="L186">        claim.setStatus(request.getStatus());</span>
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">        if (request.getStatus() == ClaimStatus.APPROVED) {</span>
+<span class="fc" id="L188">            log.info(&quot;Claim {} approved by reviewer {}&quot;, claimId, reviewerId);</span>
+        }
+
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">        if (request.getStatus() == ClaimStatus.REJECTED) {</span>
+<span class="nc" id="L192">            log.info(&quot;Claim {} rejected by reviewer {}&quot;, claimId, reviewerId);</span>
+        }
+<span class="fc" id="L194">        claim.setComment(request.getComment());</span>
+
+        // Keep reviewer aligned with the person who completed the assigned review.
+<span class="fc" id="L197">        claim.setReviewer(reviewer);</span>
+
+
+<span class="fc" id="L200">        log.info(&quot;Saving claim status update: claimId={}, status={}&quot;, claimId, request.getStatus());</span>
+<span class="fc" id="L201">        return ClaimMapper.toResponse(claimRepository.save(claim));</span>
+    }
+
+    // ========================= RESOLVE REVIEWER =========================
+    // If employee has a manager → manager is reviewer
+    // If no manager assigned → first Admin acts as fallback reviewer
+    private User resolveReviewer(User employee) {
+
+<span class="fc bfc" id="L209" title="All 2 branches covered.">        if (employee.getManager() != null) {</span>
+<span class="fc" id="L210">            log.info(&quot;Resolved reviewer from manager: employeeId={}, reviewerId={}&quot;,</span>
+<span class="fc" id="L211">                    employee.getId(), employee.getManager().getId());</span>
+<span class="fc" id="L212">            return employee.getManager();</span>
+        }
+
+<span class="fc" id="L215">        return userRepository.findByRole(Role.ADMIN)</span>
+<span class="fc" id="L216">                .stream()</span>
+<span class="fc" id="L217">                .findFirst()</span>
+<span class="fc" id="L218">                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L219">                    log.error(&quot;Database operation failed: no admin available to act as reviewer&quot;);</span>
+<span class="nc" id="L220">                    return new BadRequestException(&quot;No admin available to act as reviewer&quot;);</span>
+                });
+    }
+
+    private Pageable pageable(int page, int size) {
+<span class="fc" id="L225">        int safePage = Math.max(page, 0);</span>
+<span class="fc" id="L226">        int safeSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);</span>
+<span class="fc" id="L227">        return PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, &quot;createdAt&quot;));</span>
+    }
+
+    private PageResponseDTO&lt;ClaimResponseDTO&gt; toPageResponse(Page&lt;Claim&gt; claimPage) {
+<span class="fc" id="L231">        Page&lt;ClaimResponseDTO&gt; dtoPage = claimPage.map(ClaimMapper::toResponse);</span>
+<span class="fc" id="L232">        return PageResponseDTO.&lt;ClaimResponseDTO&gt;builder()</span>
+<span class="fc" id="L233">                .content(dtoPage.getContent())</span>
+<span class="fc" id="L234">                .page(dtoPage.getNumber())</span>
+<span class="fc" id="L235">                .size(dtoPage.getSize())</span>
+<span class="fc" id="L236">                .totalElements(dtoPage.getTotalElements())</span>
+<span class="fc" id="L237">                .totalPages(dtoPage.getTotalPages())</span>
+<span class="fc" id="L238">                .first(dtoPage.isFirst())</span>
+<span class="fc" id="L239">                .last(dtoPage.isLast())</span>
+<span class="fc" id="L240">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
