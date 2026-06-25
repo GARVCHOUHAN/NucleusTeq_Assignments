@@ -1,12 +1,25 @@
-﻿﻿from pydantic import BaseModel, EmailStr
+﻿﻿
+from enum import Enum
+from pydantic import BaseModel
+from pydantic import EmailStr
+from pydantic import Field
 
-class UserCreate(BaseModel):
-    name: str
+
+class UserRole(str, Enum):
+
+    ADMIN = "ADMIN"
+
+    MEMBER = "MEMBER"
+
+    VIEWER = "VIEWER"
+
+
+class UserRegisterRequest(BaseModel):
+
+    name: str = Field(min_length=3,max_length=50)
+
     email: EmailStr
-    password: str
-    role: str
 
-class UserResponse(BaseModel):
-    name: str
-    email: str
-    role: str
+    password: str = Field(min_length=8,max_length=30)
+
+    role: UserRole
