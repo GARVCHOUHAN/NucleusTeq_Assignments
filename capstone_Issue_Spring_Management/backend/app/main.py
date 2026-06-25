@@ -1,7 +1,7 @@
 ﻿from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.api.auth_router import router as auth_router
 from app.api.health_router import router as health_router
 
 from app.core.lifespan import lifespan
@@ -33,4 +33,9 @@ application.add_middleware(
 
 application.include_router(
     health_router
+)
+
+
+application.include_router(
+    auth_router
 )
