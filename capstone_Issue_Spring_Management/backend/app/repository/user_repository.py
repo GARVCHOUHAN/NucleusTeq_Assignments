@@ -13,3 +13,4 @@ class UserRepository:
     def create_user(user_document: dict):
 
         users_collection.insert_one(user_document)
+    
