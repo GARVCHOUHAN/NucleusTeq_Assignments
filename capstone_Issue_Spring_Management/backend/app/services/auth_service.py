@@ -11,6 +11,15 @@ from app.exceptions.custom_exception import (
     InvalidCredentialsException
 )
 
+from app.repositories.user_repository import (
+    UserRepository
+)
+
+
+
+
+    
+
 class AuthService:
 
     @staticmethod
@@ -69,5 +78,18 @@ class AuthService:
             }
 
     }
+        
+    @staticmethod
+    def get_current_user(
+
+        email: str
+
+    ):
+
+        user = UserRepository.get_user_by_email(
+            email
+        )
+
+        return user
         
         

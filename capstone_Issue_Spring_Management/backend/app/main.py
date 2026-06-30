@@ -7,7 +7,7 @@ from app.api.health_router import router as health_router
 from app.core.lifespan import lifespan
 from app.exceptions.handlers import register_exception_handlers
 
-
+from app.routers.project_router import (router as project_router)
 
 application = FastAPI(
 
@@ -41,4 +41,9 @@ application.include_router(
 application.include_router(
     auth_router
 )
+
+application.include_router(
+    project_router
+)
+
 register_exception_handlers(application)
