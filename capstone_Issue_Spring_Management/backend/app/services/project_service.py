@@ -1,6 +1,7 @@
 ﻿from app.repositories.project_repository import (
     ProjectRepository
 )
+from app.utils.audit import generate_audit_fields
 
 
 class ProjectService:
@@ -30,7 +31,9 @@ class ProjectService:
 
             "description": project.description,
 
-            "created_by": current_user["email"]
+            **generate_audit_fields(
+                current_user["email"]
+            )
 
         }
 
@@ -43,3 +46,26 @@ class ProjectService:
             "message": "Project created successfully."
 
         }
+        
+        @staticmethod
+        def get_all_projects():
+
+            return ProjectRepository.get_all_projects()
+
+
+        @staticmethod
+        def get_project_by_id(
+            project_id: str
+        ):
+
+            project = ProjectRepository.get_project_by_id(
+                project_id
+            )
+
+            if project is None:
+
+                raise Exception(
+                    "Project not found."
+                )
+
+            return project

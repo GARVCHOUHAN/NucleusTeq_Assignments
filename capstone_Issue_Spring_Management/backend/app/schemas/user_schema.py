@@ -1,5 +1,4 @@
-﻿﻿
-from enum import Enum
+﻿from enum import Enum
 from pydantic import BaseModel
 from pydantic import EmailStr
 from pydantic import Field
