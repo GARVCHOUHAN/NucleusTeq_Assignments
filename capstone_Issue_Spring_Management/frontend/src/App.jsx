@@ -32,6 +32,30 @@ function App() {
                             </ProtectedRoute>
                         } 
                     />
+
+                    {/* Default redirect to login */}
+                    <Route path="/" element={<Navigate to="/login" replace />} />
+                    
+                    <Route path="/login" element={<Login />} />
+
+                    <Route 
+                        path="/dashboard" 
+                        element={
+                            <ProtectedRoute>
+                                <Dashboard />
+                            </ProtectedRoute>
+                        } 
+                    />
+
+                    {/* New Sprint Board Route */}
+                    <Route 
+                        path="/board" 
+                        element={
+                            <ProtectedRoute>
+                                <SprintBoard />
+                            </ProtectedRoute>
+                        } 
+                    />
                 </Routes>
             </Router>
         </AuthProvider>
