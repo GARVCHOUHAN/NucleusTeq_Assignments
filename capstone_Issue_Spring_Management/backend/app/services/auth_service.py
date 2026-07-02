@@ -81,15 +81,17 @@ class AuthService:
         
     @staticmethod
     def get_current_user(
-
         email: str
-
     ):
 
-        user = UserRepository.get_user_by_email(
+        if not email:
+
+            return None
+
+        return UserRepository.get_user_by_email(
             email
         )
-
-        return user
+        
+        
         
         

@@ -5,7 +5,7 @@ from app.exceptions.custom_exception import UserAlreadyExistsException
 from app.schemas.response_schema import SuccessResponse
 
 from app.schemas.user_schema import UserRegisterRequest
-
+from app.schemas.login_schema import LoginRequest
 from app.services.auth_service import AuthService
 
 router = APIRouter(
@@ -15,6 +15,13 @@ router = APIRouter(
     tags=["Authentication"]
 
 )
+
+@router.post("/login")
+def login_user(
+    user: LoginRequest
+):
+
+    return AuthService.login_user(user)
 
 
 @router.post(

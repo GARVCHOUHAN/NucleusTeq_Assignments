@@ -46,3 +46,4 @@ application.include_router(
 )
 
 register_exception_handlers(application)
+

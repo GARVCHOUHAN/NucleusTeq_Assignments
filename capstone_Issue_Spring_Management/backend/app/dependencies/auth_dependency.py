@@ -1,79 +1,64 @@
 ﻿from fastapi import Depends
+from fastapi import Header
 from fastapi import HTTPException
 from fastapi import status
 
 from app.core.roles import Roles
+from app.services.auth_service import AuthService
 
-def get_current_user():
 
+def get_current_user(
+    user_email: str = Header(alias="X-User-Email")
+):
     """
-    Temporary current user.
+    Fetch current user from database.
 
-    Replace this with JWT decoding later.
+    NOTE:
+    This is a temporary solution.
+    Later this dependency will read the
+    email from JWT instead of request header.
     """
 
-    return {
+    current_user = AuthService.get_current_user(
+        user_email
+    )
 
-        "name": "Admin User",
+    if current_user is None:
 
-        "email": "admin@test.com",
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found."
+        )
 
-        "role": Roles.ADMIN
-
-    }
+    return current_user
 
 
 def require_admin(
-
-    current_user: dict = Depends(
-        get_current_user
-    )
-
+    current_user: dict = Depends(get_current_user)
 ):
-
-    """
-    Allow only ADMIN.
-    """
 
     if current_user["role"] != Roles.ADMIN:
 
         raise HTTPException(
-
             status_code=status.HTTP_403_FORBIDDEN,
-
-            detail="Admin access required."
-
+            detail="Only ADMIN can perform this action."
         )
 
     return current_user
 
 
 def require_member(
-
-    current_user: dict = Depends(
-        get_current_user
-    )
-
+    current_user: dict = Depends(get_current_user)
 ):
 
-    """
-    Allow ADMIN and MEMBER.
-    """
-
     if current_user["role"] not in [
-
         Roles.ADMIN,
-
         Roles.MEMBER
-
     ]:
 
         raise HTTPException(
-
             status_code=status.HTTP_403_FORBIDDEN,
-
             detail="Unauthorized."
-
         )
 
     return current_user
