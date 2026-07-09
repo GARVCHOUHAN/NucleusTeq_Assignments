@@ -7,7 +7,11 @@ from app.api.health_router import router as health_router
 from app.core.lifespan import lifespan
 from app.exceptions.handlers import register_exception_handlers
 
-from app.routers.project_router import (router as project_router)
+from app.api.project_router import (router as project_router)
+from app.api.issue_router import (router as issue_router)
+from app.api.sprint_router import router as sprint_router
+from app.api.comment_router import router as comment_router
+from app.api.dashboard_router import router as dashboard_router
 
 application = FastAPI(
 
@@ -43,6 +47,22 @@ application.include_router(
 
 application.include_router(
     project_router
+)
+
+application.include_router(
+    issue_router
+)
+
+application.include_router(
+    sprint_router
+)
+
+application.include_router(
+    comment_router
+)
+
+application.include_router(
+    dashboard_router
 )
 
 register_exception_handlers(application)
