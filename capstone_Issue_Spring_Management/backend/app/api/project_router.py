@@ -1,8 +1,4 @@
-﻿"""
-Project API routes.
-"""
-
-from fastapi import APIRouter
+﻿from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Path
 from fastapi import status
