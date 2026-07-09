@@ -55,9 +55,7 @@ class ProjectCreateRequest(BaseModel):
         project_key = value.strip().upper()
 
         if not project_key.replace("_", "").isalnum():
-            raise ValueError(
-                "Project key can contain only letters, numbers, and underscores."
-            )
+            raise ValueError("Project key can contain only letters, numbers, and underscores.")
 
         return project_key
 
