@@ -1,42 +1,24 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi import Request
-from fastapi.responses import JSONResponse
 from fastapi import status
+from fastapi.responses import JSONResponse
 
-from app.exceptions.custom_exception import (
-    ProjectAlreadyExistsException,
-    ProjectNotFoundException,
-    UserAlreadyExistsException,
-    InvalidCredentialsException
-)
-from app.exceptions.custom_exception import (
-    ProjectAlreadyExistsException,
-    ProjectNotFoundException,
-    MemberAlreadyExistsException,
-    MemberNotFoundException
-)
+from app.exceptions.custom_exception import AlreadyExistsException
+from app.exceptions.custom_exception import BadRequestException
+from app.exceptions.custom_exception import ForbiddenException
+from app.exceptions.custom_exception import NotFoundException
+from app.exceptions.custom_exception import UnauthorizedException
+
 
 def register_exception_handlers(application: FastAPI) -> None:
     """
-    Register all custom exception handlers.
+    Register generic exception handlers.
     """
 
-    @application.exception_handler(UserAlreadyExistsException)
-    async def user_exists_exception_handler(
+    @application.exception_handler(UnauthorizedException)
+    async def unauthorized_handler(
         request: Request,
-        exception: UserAlreadyExistsException
-    ):
-        return JSONResponse(
-            status_code=status.HTTP_409_CONFLICT,
-            content={
-                "detail": exception.message
-            }
-        )
-
-    @application.exception_handler(InvalidCredentialsException)
-    async def invalid_credentials_handler(
-        request: Request,
-        exception: InvalidCredentialsException
+        exception: UnauthorizedException
     ):
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -45,61 +27,11 @@ def register_exception_handlers(application: FastAPI) -> None:
             }
         )
 
-    @application.exception_handler(
-        ProjectAlreadyExistsException
-    )
-    async def project_exists_handler(
+    @application.exception_handler(NotFoundException)
+    async def not_found_handler(
         request: Request,
-        exception: ProjectAlreadyExistsException
+        exception: NotFoundException
     ):
-
-        return JSONResponse(
-            status_code=409,
-            content={
-                "detail": exception.message
-            }
-        )
-
-
-    @application.exception_handler(
-        ProjectNotFoundException
-    )
-    async def project_not_found_handler(
-        request: Request,
-        exception: ProjectNotFoundException
-    ):
-
-        return JSONResponse(
-            status_code=404,
-            content={
-                "detail": exception.message
-            }
-        )
-        
-    @application.exception_handler(
-        ProjectAlreadyExistsException
-    )
-    async def project_exists_handler(
-        request: Request,
-        exception: ProjectAlreadyExistsException
-    ):
-
-        return JSONResponse(
-            status_code=status.HTTP_409_CONFLICT,
-            content={
-                "detail": exception.message
-            }
-        )
-
-
-    @application.exception_handler(
-        ProjectNotFoundException
-    )
-    async def project_not_found_handler(
-        request: Request,
-        exception: ProjectNotFoundException
-    ):
-
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={
@@ -107,15 +39,11 @@ def register_exception_handlers(application: FastAPI) -> None:
             }
         )
 
-
-    @application.exception_handler(
-        MemberAlreadyExistsException
-    )
-    async def member_exists_handler(
+    @application.exception_handler(AlreadyExistsException)
+    async def already_exists_handler(
         request: Request,
-        exception: MemberAlreadyExistsException
+        exception: AlreadyExistsException
     ):
-
         return JSONResponse(
             status_code=status.HTTP_409_CONFLICT,
             content={
@@ -123,18 +51,26 @@ def register_exception_handlers(application: FastAPI) -> None:
             }
         )
 
-
-    @application.exception_handler(
-        MemberNotFoundException
-    )
-    async def member_not_found_handler(
+    @application.exception_handler(BadRequestException)
+    async def bad_request_handler(
         request: Request,
-        exception: MemberNotFoundException
+        exception: BadRequestException
     ):
-
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             content={
                 "detail": exception.message
             }
-        )    
+        )
+
+    @application.exception_handler(ForbiddenException)
+    async def forbidden_handler(
+        request: Request,
+        exception: ForbiddenException
+    ):
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content={
+                "detail": exception.message
+            }
+        )
