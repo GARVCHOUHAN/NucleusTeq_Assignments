@@ -19,10 +19,7 @@ def _serialize_value(value: Any) -> Any:
         return value.isoformat()
 
     if isinstance(value, list):
-        return [
-            _serialize_value(item)
-            for item in value
-        ]
+        return [_serialize_value(item) for item in value]
 
     if isinstance(value, dict):
         return {
@@ -47,21 +44,11 @@ class ProjectRepository:
 
     @staticmethod
     def get_project_by_name(project_name: str):
-        return projects_collection.find_one(
-            {
-                "name": project_name,
-                "is_deleted": False
-            }
-        )
+        return projects_collection.find_one({"name": project_name,"is_deleted": False})
 
     @staticmethod
     def get_project_by_key(project_key: str):
-        return projects_collection.find_one(
-            {
-                "project_key": project_key,
-                "is_deleted": False
-            }
-        )
+        return projects_collection.find_one({"project_key": project_key,"is_deleted": False})
 
     @staticmethod
     def get_project_by_id(project_id: str):
@@ -70,12 +57,7 @@ class ProjectRepository:
         if object_id is None:
             return None
 
-        project = projects_collection.find_one(
-            {
-                "_id": object_id,
-                "is_deleted": False
-            }
-        )
+        project = projects_collection.find_one({"_id": object_id,"is_deleted": False})
 
         return _serialize_document(project)
 
@@ -83,11 +65,7 @@ class ProjectRepository:
     def get_all_projects():
         return [
             _serialize_document(project)
-            for project in projects_collection.find(
-                {
-                    "is_deleted": False
-                }
-            )
+            for project in projects_collection.find({"is_deleted": False})
         ]
 
     @staticmethod
@@ -103,10 +81,7 @@ class ProjectRepository:
         ]
 
     @staticmethod
-    def update_project(
-        project_id: str,
-        updated_document: dict
-    ):
+    def update_project(project_id: str,updated_document: dict):
         object_id = _to_object_id(project_id)
 
         if object_id is None:
@@ -133,33 +108,19 @@ class ProjectRepository:
             {
                 "_id": object_id
             },
-            {
-                "$set": {
-                    "is_deleted": True
-                }
-            }
+            {"$set": {"is_deleted": True}}
         )
 
     @staticmethod
-    def add_member(
-        project_id: str,
-        member_document: dict
-    ):
+    def add_member(project_id: str,member_document: dict):
         object_id = _to_object_id(project_id)
 
         if object_id is None:
             return None
 
         return projects_collection.update_one(
-            {
-                "_id": object_id,
-                "is_deleted": False
-            },
-            {
-                "$push": {
-                    "members": member_document
-                }
-            }
+            {"_id": object_id,"is_deleted": False},
+            {"$push": {"members": member_document}}
         )
 
     @staticmethod
@@ -177,20 +138,11 @@ class ProjectRepository:
                 "_id": object_id,
                 "is_deleted": False
             },
-            {
-                "$pull": {
-                    "members": {
-                        "email": email
-                    }
-                }
-            }
+            {"$pull": {"members": {"email": email}}}
         )
 
     @staticmethod
-    def member_exists(
-        project_id: str,
-        email: str
-    ):
+    def member_exists(project_id: str,email: str):
         object_id = _to_object_id(project_id)
 
         if object_id is None:

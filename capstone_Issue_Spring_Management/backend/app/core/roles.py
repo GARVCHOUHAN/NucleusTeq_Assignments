@@ -1,10 +1,3 @@
-﻿"""
-Role constants used across the application.
-"""
-
-
-class Roles:
-
+﻿class Roles:
     ADMIN = "ADMIN"
-
     MEMBER = "MEMBER"

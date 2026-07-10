@@ -1,17 +1,7 @@
 ﻿from fastapi import APIRouter
 
-router = APIRouter(
-    tags=["Health"]
-)
-
+router = APIRouter(tags=["Health"])
 
 @router.get("/health")
 def health():
-
-    return {
-
-        "status": "Running",
-
-        "message": "Issue & Sprint Management System API"
-
-    }
+    return {"status": "Running","message": "Issue & Sprint Management System API"}

@@ -4,13 +4,14 @@ from pydantic import BaseModel
 from pydantic import EmailStr
 from pydantic import Field
 from pydantic import field_validator
-from app.core.project_constants import PROJECT_DESCRIPTION_MAX_LENGTH
-from app.core.project_constants import PROJECT_DESCRIPTION_MIN_LENGTH
-from app.core.project_constants import PROJECT_KEY_MAX_LENGTH
-from app.core.project_constants import PROJECT_KEY_MIN_LENGTH
-from app.core.project_constants import PROJECT_NAME_MAX_LENGTH
-from app.core.project_constants import PROJECT_NAME_MIN_LENGTH
-
+from app.constants import (
+    PROJECT_DESCRIPTION_MAX_LENGTH,
+    PROJECT_DESCRIPTION_MIN_LENGTH,
+    PROJECT_KEY_MAX_LENGTH,
+    PROJECT_KEY_MIN_LENGTH,
+    PROJECT_NAME_MAX_LENGTH,
+    PROJECT_NAME_MIN_LENGTH
+)
 
 class ProjectMember(BaseModel):
     email: EmailStr
@@ -84,28 +85,18 @@ class ProjectUpdateRequest(BaseModel):
     def validate_optional_text(cls, value: Optional[str]) -> Optional[str]:
         if value is None:
             return value
-
         stripped_value = value.strip()
-
         if not stripped_value:
             raise ValueError("Field cannot be empty.")
-
         return stripped_value
 
     @field_validator("project_key")
     @classmethod
-    def validate_optional_project_key(
-        cls,
-        value: Optional[str]
-    ) -> Optional[str]:
+    def validate_optional_project_key(cls,value: Optional[str]) -> Optional[str]:
         if value is None:
             return value
-
         project_key = value.strip().upper()
-
         if not project_key.replace("_", "").isalnum():
-            raise ValueError(
-                "Project key can contain only letters, numbers, and underscores."
-            )
+            raise ValueError("Project key can contain only letters, numbers, and underscores.")
 
         return project_key

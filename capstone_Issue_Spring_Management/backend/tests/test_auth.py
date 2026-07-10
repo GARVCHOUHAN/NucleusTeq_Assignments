@@ -8,6 +8,12 @@ from app.database.collections import users_collection
 REGISTER_URL = "/auth/register"
 LOGIN_URL = "/auth/login"
 
+student_info = {
+    "name": "Garv",
+    "email": "garv@test.com",
+    "password": "Password@123",
+    "role": "MEMBER"
+}
 
 def test_register_user_success(client):
     """
@@ -16,12 +22,7 @@ def test_register_user_success(client):
 
     response = client.post(
         REGISTER_URL,
-        json={
-            "name": "Garv",
-            "email": "garv@test.com",
-            "password": "Password@123",
-            "role": "MEMBER"
-        }
+        json=student_info
     )
 
     assert response.status_code == 201
@@ -36,13 +37,7 @@ def test_register_duplicate_email(client):
     Duplicate email should fail.
     """
 
-    payload = {
-        "name": "Garv",
-        "email": "garv@test.com",
-        "password": "Password@123",
-        "role": "MEMBER"
-    }
-
+    payload = student_info
     client.post(
         REGISTER_URL,
         json=payload
@@ -102,12 +97,7 @@ def test_password_is_hashed(client):
 
     client.post(
         REGISTER_URL,
-        json={
-            "name": "Garv",
-            "email": "garv@test.com",
-            "password": "Password@123",
-            "role": "MEMBER"
-        }
+        json=student_info
     )
 
     user = users_collection.find_one(
@@ -128,12 +118,7 @@ def test_login_success(client):
 
     client.post(
         REGISTER_URL,
-        json={
-            "name": "Garv",
-            "email": "garv@test.com",
-            "password": "Password@123",
-            "role": "MEMBER"
-        }
+        json=student_info
     )
 
     response = client.post(
@@ -156,12 +141,7 @@ def test_login_wrong_password(client):
 
     client.post(
         REGISTER_URL,
-        json={
-            "name": "Garv",
-            "email": "garv@test.com",
-            "password": "Password@123",
-            "role": "MEMBER"
-        }
+        json=student_info
     )
 
     response = client.post(

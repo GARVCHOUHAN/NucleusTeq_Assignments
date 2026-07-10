@@ -21,10 +21,7 @@ def create_sprint(
     sprint: SprintCreateRequest,
     current_user: dict = Depends(require_member)
 ):
-    return SprintService.create_sprint(
-        sprint,
-        current_user
-    )
+    return SprintService.create_sprint(sprint,current_user)
 
 
 @router.get("")
@@ -32,10 +29,7 @@ def get_sprints(
     project_id: str | None = Query(default=None),
     current_user: dict = Depends(require_member)
 ):
-    return SprintService.get_sprints(
-        current_user,
-        project_id
-    )
+    return SprintService.get_sprints(current_user,project_id)
 
 
 @router.get("/{sprint_id}")
@@ -43,10 +37,7 @@ def get_sprint_by_id(
     sprint_id: str = Path(...),
     current_user: dict = Depends(require_member)
 ):
-    return SprintService.get_sprint_by_id(
-        sprint_id,
-        current_user
-    )
+    return SprintService.get_sprint_by_id(sprint_id,current_user)
 
 
 @router.post("/{sprint_id}/issues")
@@ -55,11 +46,7 @@ def add_issue_to_sprint(
     sprint_id: str = Path(...),
     current_user: dict = Depends(require_member)
 ):
-    return SprintService.add_issue(
-        sprint_id,
-        sprint.issue_id,
-        current_user
-    )
+    return SprintService.add_issue(sprint_id,sprint.issue_id,current_user)
 
 
 @router.delete("/{sprint_id}/issues/{issue_id}")
@@ -68,11 +55,7 @@ def remove_issue_from_sprint(
     issue_id: str = Path(...),
     current_user: dict = Depends(require_member)
 ):
-    return SprintService.remove_issue(
-        sprint_id,
-        issue_id,
-        current_user
-    )
+    return SprintService.remove_issue(sprint_id,issue_id,current_user)
 
 
 @router.patch("/{sprint_id}/start")
@@ -80,10 +63,7 @@ def start_sprint(
     sprint_id: str = Path(...),
     current_user: dict = Depends(require_member)
 ):
-    return SprintService.start_sprint(
-        sprint_id,
-        current_user
-    )
+    return SprintService.start_sprint(sprint_id,current_user)
 
 
 @router.patch("/{sprint_id}/complete")
@@ -91,7 +71,4 @@ def complete_sprint(
     sprint_id: str = Path(...),
     current_user: dict = Depends(require_member)
 ):
-    return SprintService.complete_sprint(
-        sprint_id,
-        current_user
-    )
+    return SprintService.complete_sprint(sprint_id,current_user)
