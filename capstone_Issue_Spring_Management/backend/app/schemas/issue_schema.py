@@ -6,7 +6,7 @@ from pydantic import EmailStr
 from pydantic import Field
 from pydantic import field_validator
 
-from app.core.issue_constants import (
+from app.constants import (
     ISSUE_TITLE_MAX_LENGTH,
     ISSUE_TITLE_MIN_LENGTH,
     ISSUE_DESCRIPTION_MAX_LENGTH,
@@ -50,6 +50,7 @@ class IssueCreateRequest(BaseModel):
         min_length=1,
         max_length=ISSUE_KEY_MAX_LENGTH
     )
+    parent_id: Optional[str] = None
     assignee_email: Optional[EmailStr] = None
     issue_type: IssueType = IssueType.TASK
     priority: IssuePriority = IssuePriority.MEDIUM
@@ -117,3 +118,18 @@ class IssueUpdateRequest(BaseModel):
 
 class IssueStatusUpdateRequest(BaseModel):
     status: IssueStatus
+
+
+class IssueResponse(BaseModel):
+    id: Optional[str] = None
+    issue_key: Optional[str] = None
+    title: str
+    description: str
+    project_id: Optional[str] = None
+    parent_id: Optional[str] = None
+    reporter: Optional[str] = None
+    assignee: Optional[str] = None
+    issue_type: Optional[str] = None
+    status: Optional[str] = None
+    priority: Optional[str] = None
+    story_points: Optional[int] = None

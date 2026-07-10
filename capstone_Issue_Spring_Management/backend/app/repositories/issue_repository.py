@@ -45,6 +45,7 @@ class IssueRepository:
 
     @staticmethod
     def create_issue(issue_document: dict):
+        issue_document.setdefault("is_deleted", False)
         return issues_collection.insert_one(issue_document)
 
     @staticmethod
@@ -164,6 +165,37 @@ class IssueRepository:
                 }
             )
         ]
+
+    @staticmethod
+    def get_issues_by_parent_id(parent_id: str):
+        return [
+            _serialize_document(issue)
+            for issue in issues_collection.find(
+                {
+                    "parent_id": parent_id,
+                    "is_deleted": False
+                }
+            )
+        ]
+
+    @staticmethod
+    def delete_issue(issue_id: str):
+        object_id = _to_object_id(issue_id)
+
+        if object_id is None:
+            return None
+
+        return issues_collection.update_one(
+            {
+                "_id": object_id,
+                "is_deleted": False
+            },
+            {
+                "$set": {
+                    "is_deleted": True
+                }
+            }
+        )
 
     @staticmethod
     def update_issue(issue_id: str, updated_document: dict):

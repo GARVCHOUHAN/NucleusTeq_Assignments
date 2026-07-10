@@ -12,21 +12,11 @@ from app.schemas.issue_schema import (
 )
 from app.services.issue_service import IssueService
 
-router = APIRouter(
-    prefix="/issues",
-    tags=["Issues"]
-)
-
+router = APIRouter(prefix="/issues",tags=["Issues"])
 
 @router.post("", status_code=status.HTTP_201_CREATED)
-def create_issue(
-    issue: IssueCreateRequest,
-    current_user: dict = Depends(require_member)
-):
-    return IssueService.create_issue(
-        issue,
-        current_user
-    )
+def create_issue(issue: IssueCreateRequest,current_user: dict = Depends(require_member)):
+    return IssueService.create_issue(issue,current_user)
 
 
 @router.get("")
@@ -57,10 +47,7 @@ def get_issue_by_id(
     issue_id: str = Path(...),
     current_user: dict = Depends(require_member)
 ):
-    return IssueService.get_issue_by_id(
-        issue_id,
-        current_user
-    )
+    return IssueService.get_issue_by_id(issue_id,current_user)
 
 
 @router.get("/project/{project_id}")
@@ -68,32 +55,22 @@ def get_project_issues(
     project_id: str = Path(...),
     current_user: dict = Depends(require_member)
 ):
-    return IssueService.get_issues_by_project(
-        project_id,
-        current_user
-    )
+    return IssueService.get_issues_by_project(project_id,current_user)
 
 
 @router.get("/assigned/me")
-def get_assigned_issues(
-    current_user: dict = Depends(require_member)
-):
-    return IssueService.get_assigned_issues(
-        current_user
-    )
+def get_assigned_issues(current_user: dict = Depends(require_member)):
+    return IssueService.get_assigned_issues(current_user)
+
+
+@router.get("/{issue_id}/subtasks")
+def get_subtasks(issue_id: str = Path(...), current_user: dict = Depends(require_member)):
+    return IssueService.get_subtasks(issue_id, current_user)
 
 
 @router.patch("/{issue_id}")
-def update_issue(
-    issue_id: str,
-    issue: IssueUpdateRequest,
-    current_user: dict = Depends(require_member)
-):
-    return IssueService.update_issue(
-        issue_id,
-        issue.model_dump(exclude_unset=True),
-        current_user
-    )
+def update_issue(issue_id: str,issue: IssueUpdateRequest,current_user: dict = Depends(require_member)):
+    return IssueService.update_issue(issue_id,issue.model_dump(exclude_unset=True),current_user)
 
 
 @router.patch("/{issue_id}/status")
@@ -102,8 +79,9 @@ def update_issue_status(
     status_update: IssueStatusUpdateRequest,
     current_user: dict = Depends(require_member)
 ):
-    return IssueService.update_issue_status(
-        issue_id,
-        status_update.status.value,
-        current_user
-    )
+    return IssueService.update_issue_status(issue_id,status_update.status.value,current_user)
+
+
+@router.delete("/{issue_id}")
+def delete_issue(issue_id: str = Path(...), current_user: dict = Depends(require_member)):
+    return IssueService.delete_issue(issue_id, current_user)
