@@ -36,34 +36,13 @@ application.add_middleware(
 
 )
 
-application.include_router(
-    health_router
-)
-
-
-application.include_router(
-    auth_router
-)
-
-application.include_router(
-    project_router
-)
-
-application.include_router(
-    issue_router
-)
-
-application.include_router(
-    sprint_router
-)
-
-application.include_router(
-    comment_router
-)
-
-application.include_router(
-    dashboard_router
-)
+application.include_router(health_router)
+application.include_router(auth_router)
+application.include_router(project_router)
+application.include_router(issue_router)
+application.include_router(sprint_router)
+application.include_router(comment_router)
+application.include_router(dashboard_router)
 
 register_exception_handlers(application)
 
