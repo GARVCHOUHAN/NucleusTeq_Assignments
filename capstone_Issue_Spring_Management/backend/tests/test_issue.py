@@ -134,6 +134,63 @@ def test_create_issue_assignee_not_member(client):
     assert response.status_code == 400
 
 
+def test_create_subtask_and_fetch_subtasks(client):
+    create_admin(client)
+    create_member(client)
+    create_sample_project(client)
+
+    project = projects_collection.find_one({"name": "Issue Tracker"})
+    parent_issue = create_issue(client, project["_id"], assignee_email="member@test.com")
+    parent_id = parent_issue.json()["issue_id"]
+
+    response = client.post(
+        ISSUES_URL,
+        headers={
+            "X-User-Email": "member@test.com"
+        },
+        json={
+            "title": "Subtask issue",
+            "description": "Child issue",
+            "project_id": str(project["_id"]),
+            "parent_id": parent_id,
+            "issue_type": "TASK"
+        }
+    )
+
+    assert response.status_code == 201
+
+    subtasks_response = client.get(
+        f"{ISSUES_URL}/{parent_id}/subtasks",
+        headers={
+            "X-User-Email": "member@test.com"
+        }
+    )
+
+    assert subtasks_response.status_code == 200
+    assert len(subtasks_response.json()) == 1
+    assert subtasks_response.json()[0]["parent_id"] == parent_id
+
+
+def test_delete_issue(client):
+    create_admin(client)
+    create_member(client)
+    create_sample_project(client)
+
+    project = projects_collection.find_one({"name": "Issue Tracker"})
+    issue_resp = create_issue(client, project["_id"], assignee_email="member@test.com")
+    issue_id = issue_resp.json()["issue_id"]
+
+    response = client.delete(
+        f"{ISSUES_URL}/{issue_id}",
+        headers={
+            "X-User-Email": "member@test.com"
+        }
+    )
+
+    assert response.status_code == 200
+    assert response.json()["message"] == "Issue deleted successfully."
+
+
 def test_get_issue_by_id(client):
     create_admin(client)
     create_member(client)
