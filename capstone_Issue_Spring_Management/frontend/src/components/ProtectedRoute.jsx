@@ -1,16 +1,20 @@
-﻿import { useContext } from 'react';
-import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "../context/auth-context";
+
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-    const { user } = useContext(AuthContext);
+    const { currentUser, loading } = useContext(AuthContext);
 
-    if (!user) {
+    if (loading) {
+        return null;
+    }
+
+    if (!currentUser) {
         return <Navigate to="/login" replace />;
     }
 
-    if (requiredRole && user.role !== requiredRole) {
-        // Kick them to a safe page if they aren't an admin
+    if (requiredRole && currentUser.role !== requiredRole) {
         return <Navigate to="/dashboard" replace />;
     }
 
