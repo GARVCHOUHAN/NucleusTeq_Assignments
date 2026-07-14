@@ -1,36 +1,52 @@
-﻿from bson import ObjectId
+﻿from datetime import datetime
+from typing import Any
+from bson import ObjectId
+from bson.errors import InvalidId
+from app.database.collections import projects_collection
 
-from app.database.collections import (projects_collection)
+def _to_object_id(project_id: str) -> ObjectId | None:
+    try:
+        return ObjectId(project_id)
+    except (InvalidId, TypeError):
+        return None
 
 
-"""
-Repository layer for Project collection.
+def _serialize_value(value: Any) -> Any:
+    if isinstance(value, ObjectId):
+        return str(value)
 
-This class contains only database operations.
-No business logic should be written here.
-"""
+    if isinstance(value, datetime):
+        return value.isoformat()
+
+    if isinstance(value, list):
+        return [
+            _serialize_value(item)
+            for item in value
+        ]
+
+    if isinstance(value, dict):
+        return {
+            key: _serialize_value(item)
+            for key, item in value.items()
+        }
+
+    return value
+
+
+def _serialize_document(document: dict | None) -> dict | None:
+    if document is None:
+        return None
+
+    return _serialize_value(document)
+
 
 class ProjectRepository:
-    """
-    Repository class for Project CRUD operations.
-    """
-
     @staticmethod
     def create_project(project_document: dict):
-        """
-        Insert a new project.
-        """
-
-        return projects_collection.insert_one(
-            project_document
-        )
+        return projects_collection.insert_one(project_document)
 
     @staticmethod
     def get_project_by_name(project_name: str):
-        """
-        Fetch project by name.
-        """
-
         return projects_collection.find_one(
             {
                 "name": project_name,
@@ -40,10 +56,6 @@ class ProjectRepository:
 
     @staticmethod
     def get_project_by_key(project_key: str):
-        """
-        Fetch project by project key.
-        """
-
         return projects_collection.find_one(
             {
                 "project_key": project_key,
@@ -53,58 +65,56 @@ class ProjectRepository:
 
     @staticmethod
     def get_project_by_id(project_id: str):
-        """
-        Fetch project using project id.
-        """
+        object_id = _to_object_id(project_id)
 
-        return projects_collection.find_one(
+        if object_id is None:
+            return None
+
+        project = projects_collection.find_one(
             {
-                "_id": ObjectId(project_id),
+                "_id": object_id,
                 "is_deleted": False
             }
         )
 
+        return _serialize_document(project)
+
     @staticmethod
     def get_all_projects():
-        """
-        Fetch all active projects.
-        """
-
-        return list(
-            projects_collection.find(
+        return [
+            _serialize_document(project)
+            for project in projects_collection.find(
                 {
                     "is_deleted": False
                 }
             )
-        )
+        ]
 
     @staticmethod
     def get_projects_by_member(email: str):
-        """
-        Fetch projects assigned to a member.
-        """
-
-        return list(
-            projects_collection.find(
+        return [
+            _serialize_document(project)
+            for project in projects_collection.find(
                 {
                     "members.email": email,
                     "is_deleted": False
                 }
             )
-        )
+        ]
 
     @staticmethod
     def update_project(
         project_id: str,
         updated_document: dict
     ):
-        """
-        Update project details.
-        """
+        object_id = _to_object_id(project_id)
+
+        if object_id is None:
+            return None
 
         return projects_collection.update_one(
             {
-                "_id": ObjectId(project_id),
+                "_id": object_id,
                 "is_deleted": False
             },
             {
@@ -114,13 +124,14 @@ class ProjectRepository:
 
     @staticmethod
     def soft_delete_project(project_id: str):
-        """
-        Soft delete a project.
-        """
+        object_id = _to_object_id(project_id)
+
+        if object_id is None:
+            return None
 
         return projects_collection.update_one(
             {
-                "_id": ObjectId(project_id)
+                "_id": object_id
             },
             {
                 "$set": {
@@ -134,13 +145,15 @@ class ProjectRepository:
         project_id: str,
         member_document: dict
     ):
-        """
-        Add a member to project.
-        """
+        object_id = _to_object_id(project_id)
+
+        if object_id is None:
+            return None
 
         return projects_collection.update_one(
             {
-                "_id": ObjectId(project_id)
+                "_id": object_id,
+                "is_deleted": False
             },
             {
                 "$push": {
@@ -154,13 +167,15 @@ class ProjectRepository:
         project_id: str,
         email: str
     ):
-        """
-        Remove member from project.
-        """
+        object_id = _to_object_id(project_id)
+
+        if object_id is None:
+            return None
 
         return projects_collection.update_one(
             {
-                "_id": ObjectId(project_id)
+                "_id": object_id,
+                "is_deleted": False
             },
             {
                 "$pull": {
@@ -176,14 +191,14 @@ class ProjectRepository:
         project_id: str,
         email: str
     ):
-        """
-        Check whether member already belongs
-        to the project.
-        """
+        object_id = _to_object_id(project_id)
+
+        if object_id is None:
+            return False
 
         project = projects_collection.find_one(
             {
-                "_id": ObjectId(project_id),
+                "_id": object_id,
                 "members.email": email,
                 "is_deleted": False
             }
@@ -193,13 +208,14 @@ class ProjectRepository:
 
     @staticmethod
     def project_exists(project_id: str):
-        """
-        Check whether project exists.
-        """
+        object_id = _to_object_id(project_id)
+
+        if object_id is None:
+            return False
 
         project = projects_collection.find_one(
             {
-                "_id": ObjectId(project_id),
+                "_id": object_id,
                 "is_deleted": False
             }
         )

@@ -3,15 +3,14 @@ Business logic for Project Module.
 """
 
 from datetime import datetime
+from datetime import timezone
 
 from app.repositories.project_repository import ProjectRepository
 from app.repositories.user_repository import UserRepository
 
 from app.exceptions.custom_exception import (
-    ProjectAlreadyExistsException,
-    ProjectNotFoundException,
-    MemberAlreadyExistsException,
-    MemberNotFoundException
+    AlreadyExistsException,
+    NotFoundException
 )
 
 from app.utils.audit import generate_audit_fields
@@ -37,7 +36,7 @@ class ProjectService:
 
         if existing_project:
 
-            raise ProjectAlreadyExistsException(
+            raise AlreadyExistsException(
                 "Project already exists."
             )
 
@@ -47,20 +46,29 @@ class ProjectService:
 
         if existing_key:
 
-            raise ProjectAlreadyExistsException(
+            raise AlreadyExistsException(
                 "Project key already exists."
             )
 
         members = []
+        member_emails = set()
 
         for member in project.members:
+            if member.email in member_emails:
+                raise AlreadyExistsException(
+                    "Duplicate member email in project request."
+                )
+
+            member_emails.add(member.email)
 
             user = UserRepository.get_user_by_email(
                 member.email
             )
 
             if user is None:
-                continue
+                raise NotFoundException(
+                    f"User not found: {member.email}"
+                )
 
             members.append(
                 {
@@ -117,7 +125,7 @@ class ProjectService:
 
         if project is None:
 
-            raise ProjectNotFoundException(
+            raise NotFoundException(
                 "Project not found."
             )
 
@@ -139,13 +147,39 @@ class ProjectService:
 
         if project is None:
 
-            raise ProjectNotFoundException(
+            raise NotFoundException(
                 "Project not found."
             )
 
+        if "name" in updated_project:
+            existing_project = ProjectRepository.get_project_by_name(
+                updated_project["name"]
+            )
+
+            if (
+                existing_project
+                and str(existing_project["_id"]) != project_id
+            ):
+                raise AlreadyExistsException(
+                    "Project already exists."
+                )
+
+        if "project_key" in updated_project:
+            existing_key = ProjectRepository.get_project_by_key(
+                updated_project["project_key"]
+            )
+
+            if (
+                existing_key
+                and str(existing_key["_id"]) != project_id
+            ):
+                raise AlreadyExistsException(
+                    "Project key already exists."
+                )
+
         updated_project["updated_by"] = current_user["email"]
 
-        updated_project["updated_at"] = datetime.utcnow()
+        updated_project["updated_at"] = datetime.now(timezone.utc)
 
         ProjectRepository.update_project(
             project_id,
@@ -172,7 +206,7 @@ class ProjectService:
 
         if project is None:
 
-            raise ProjectNotFoundException(
+            raise NotFoundException(
                 "Project not found."
             )
 
@@ -201,7 +235,7 @@ class ProjectService:
 
         if project is None:
 
-            raise ProjectNotFoundException(
+            raise NotFoundException(
                 "Project not found."
             )
 
@@ -210,7 +244,7 @@ class ProjectService:
             member_email
         ):
 
-            raise MemberAlreadyExistsException(
+            raise AlreadyExistsException(
                 "Member already assigned."
             )
 
@@ -220,7 +254,7 @@ class ProjectService:
 
         if user is None:
 
-            raise MemberNotFoundException(
+            raise NotFoundException(
                 "User not found."
             )
 
@@ -260,7 +294,7 @@ class ProjectService:
             email
         ):
 
-            raise MemberNotFoundException(
+            raise NotFoundException(
                 "Member not assigned."
             )
 

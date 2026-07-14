@@ -1,12 +1,9 @@
-﻿"""
-Test cases for Project Module.
-"""
-
+﻿import pytest
 from app.database.collections import projects_collection
+from app.exceptions.custom_exception import NotFoundException
+from app.services.project_service import ProjectService
 
 PROJECT_URL = "/projects"
-
-
 def create_admin(client):
 
     client.post(
@@ -18,7 +15,6 @@ def create_admin(client):
             "role": "ADMIN"
         }
     )
-
 
 def create_member(client):
 
@@ -170,6 +166,11 @@ def test_get_project_by_invalid_id(client):
         404,
         422
     ]
+
+
+def test_get_project_by_id_uses_generic_not_found_exception():
+    with pytest.raises(NotFoundException, match="Project not found."):
+        ProjectService.get_project_by_id("123456")
 
 
 def test_delete_project(client):
