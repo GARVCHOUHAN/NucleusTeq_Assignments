@@ -9,9 +9,7 @@ from pydantic import field_validator
 
 class UserRole(str, Enum):
     ADMIN = "ADMIN"
-
     MEMBER = "MEMBER"
-
     VIEWER = "VIEWER"
 
 
@@ -59,13 +57,16 @@ class UserRegisterRequest(BaseModel):
         if missing:
             raise ValueError("Password must include " + ", ".join(missing) + ".")
         return value
-
+    
+    @field_validator("role")
+    @classmethod
+    def validate_role(cls, value: UserRole) -> UserRole:
+        return value
 
 class UserResponse(BaseModel):
     name: str
     email: str
     role: str
-
 
 class LoginResponse(BaseModel):
     message: str

@@ -1,11 +1,10 @@
 ﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Input from "../../common/input/Input";
-import Button from "../../common/button/Button";
+import Input from "../../project/common/input/Input";
+import Button from "../../project/common/button/Button";
 import AuthService from "../../../services/auth-service";
 import { ROUTES } from "../../../constants/routes";
 import styles from "./Register.module.css";
-
 function RegisterForm() {
     const navigate = useNavigate();
     const [form, setForm] = useState({

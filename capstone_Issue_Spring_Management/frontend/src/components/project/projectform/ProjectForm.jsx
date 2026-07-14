@@ -1,7 +1,7 @@
 ﻿import {useState} from "react";
 import ProjectService from "../../../services/project-service";
-import Input from "../../common/input/Input";
-import Button from "../../common/button/Button";
+import Input from "../../project/common/input/Input";
+import Button from "../../project/common/button/Button";
 import styles from "./ProjectForm.module.css";
 
 function ProjectForm({refresh}){

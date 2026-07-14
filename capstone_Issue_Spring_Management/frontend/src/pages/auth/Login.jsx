@@ -1,7 +1,7 @@
-﻿import { useState, useContext } from "react";
+﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
-import { AuthContext } from "../../context/auth-context";
+import { useAuth } from "../../hooks/use-auth";
 import { ROUTES } from "../../constants/routes";
 import styles from "./Login.module.css";
 
@@ -9,7 +9,7 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const { login } = useContext(AuthContext);
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {

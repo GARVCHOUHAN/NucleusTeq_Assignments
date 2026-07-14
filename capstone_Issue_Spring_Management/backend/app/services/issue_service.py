@@ -8,7 +8,13 @@ from app.exceptions.custom_exception import (
     ForbiddenException,
     NotFoundException
 )
-
+from app.schemas.response_schema import (
+    IssueCreatedResponse,
+    IssueUpdatedResponse,
+    IssueDeletedResponse,
+    IssueResponse,
+    PaginatedResponse
+)
 from app.utils.audit import generate_audit_fields
 
 
@@ -25,19 +31,24 @@ ALLOWED_UPDATE_FIELDS = {"title", "description", "assignee_email", "issue_type",
 
 class IssueService:
     @staticmethod
-    def _format_issue(issue: dict):
+    def _format_issue(issue: dict) -> IssueResponse:
         if issue is None:
             return None
 
-        formatted = issue.copy()
-        formatted["id"] = formatted.get("_id")
-        formatted["assignee"] = formatted.get("assignee_email")
-        formatted["reporter"] = formatted.get("reporter_email")
-        formatted["parent_id"] = formatted.get("parent_id")
-        formatted["priority"] = formatted.get("priority", "Medium")
-        formatted["story_points"] = formatted.get("story_points", 0)
-
-        return formatted
+        return IssueResponse(
+            id=str(issue.get("_id")),
+            issue_key=issue.get("issue_key"),
+            title=issue.get("title"),
+            description=issue.get("description"),
+            project_id=str(issue.get("project_id")),
+            parent_id=str(issue.get("parent_id")) if issue.get("parent_id") else None,
+            reporter=issue.get("reporter_email"),
+            assignee=issue.get("assignee_email"),
+            issue_type=issue.get("issue_type"),
+            status=issue.get("status"),
+            priority=issue.get("priority", "Medium"),
+            story_points=issue.get("story_points", 0)
+        )
 
     @staticmethod
     def _generate_issue_key(project_key: str, project_id: str) -> str:
@@ -48,20 +59,20 @@ class IssueService:
         return f"{project_key}-{issue_count + 1}"
 
     @staticmethod
-    def _paginate(items: list, page: int, limit: int):
+    def _paginate(items: list, page: int, limit: int) -> PaginatedResponse:
         page = max(page, 1)
         limit = min(max(limit, 1), 100)
         total = len(items)
         start = (page - 1) * limit
         end = start + limit
 
-        return {
-            "items": items[start:end],
-            "page": page,
-            "limit": limit,
-            "total": total,
-            "pages": (total + limit - 1) // limit
-        }
+        return PaginatedResponse(
+            items=items[start:end],
+            page=page,
+            limit=limit,
+            total=total,
+            pages=(total + limit - 1) // limit
+        )
 
     @staticmethod
     def _validate_project_access(project_id: str, current_user: dict):
@@ -117,7 +128,7 @@ class IssueService:
         )
 
     @staticmethod
-    def create_issue(issue_request, current_user: dict):
+    def create_issue(issue_request, current_user: dict) -> IssueCreatedResponse:
         project = ProjectRepository.get_project_by_id(
             issue_request.project_id
         )
@@ -168,10 +179,7 @@ class IssueService:
 
         result = IssueRepository.create_issue(issue_document)
 
-        return {
-            "message": "Issue created successfully.",
-            "issue_id": str(result.inserted_id)
-        }
+        return IssueCreatedResponse(issue_id=str(result.inserted_id))
 
     @staticmethod
     def get_issue_by_id(issue_id: str, current_user: dict):
@@ -309,7 +317,7 @@ class IssueService:
         ]
 
     @staticmethod
-    def update_issue(issue_id: str, updated_issue: dict, current_user: dict):
+    def update_issue(issue_id: str, updated_issue: dict, current_user: dict) -> IssueUpdatedResponse:
         issue = IssueRepository.get_issue_by_id(issue_id)
 
         if issue is None:
@@ -335,12 +343,10 @@ class IssueService:
             updated_issue
         )
 
-        return {
-            "message": "Issue updated successfully."
-        }
+        return IssueUpdatedResponse()
 
     @staticmethod
-    def update_issue_status(issue_id: str, status: str, current_user: dict):
+    def update_issue_status(issue_id: str, status: str, current_user: dict) -> IssueUpdatedResponse:
         issue = IssueRepository.get_issue_by_id(issue_id)
 
         if issue is None:
@@ -349,9 +355,7 @@ class IssueService:
         IssueService._ensure_status_update_access(issue, current_user)
 
         if status == issue["status"]:
-            return {
-                "message": "Issue status unchanged."
-            }
+            return IssueUpdatedResponse()
 
         allowed = ALLOWED_TRANSITIONS.get(issue["status"], [])
 
@@ -371,12 +375,10 @@ class IssueService:
             updated_document
         )
 
-        return {
-            "message": "Issue status updated successfully."
-        }
+        return IssueUpdatedResponse()
 
     @staticmethod
-    def delete_issue(issue_id: str, current_user: dict):
+    def delete_issue(issue_id: str, current_user: dict) -> IssueDeletedResponse:
         issue = IssueRepository.get_issue_by_id(issue_id)
 
         if issue is None:
@@ -387,6 +389,4 @@ class IssueService:
 
         IssueRepository.delete_issue(issue_id)
 
-        return {
-            "message": "Issue deleted successfully."
-        }
+        return IssueDeletedResponse()

@@ -1,22 +1,28 @@
 ﻿import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import styles from './IssueForm.module.css';
+import {IssueType,IssuePriority,IssueStatus} from '../constants/constants';
+import { ROUTES } from '../constants/routes';
 
 const ASSIGNEE_SEARCH_DEBOUNCE = 250;
 
 const ISSUE_TYPES = [
-    { value: 'TASK', label: 'Task' },
-    { value: 'BUG', label: 'Bug' },
-    { value: 'STORY', label: 'Feature' }
+    { value: IssueType.TASK, label: 'Task' },
+    { value: IssueType.BUG, label: 'Bug' },
+    { value: IssueType.STORY, label: 'Feature' }
 ];
-const PRIORITIES = ['Low', 'Medium', 'High'];
+const PRIORITIES = [
+    { value: IssuePriority.LOW, label: 'Low' },
+    { value: IssuePriority.MEDIUM, label: 'Medium' },
+    { value: IssuePriority.HIGH, label: 'High' }
+];
 
 const IssueForm = ({ projectId, projects = [], onClose, onCreated }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [assigneeEmail, setAssigneeEmail] = useState('');
-    const [issueType, setIssueType] = useState('TASK');
-    const [priority, setPriority] = useState('Medium');
+    const [issueType, setIssueType] = useState(IssueType.TASK);
+    const [priority, setPriority] = useState(IssuePriority.MEDIUM);
     const [storyPoints, setStoryPoints] = useState(1);
     const [parentIssueId, setParentIssueId] = useState('');
     const [availableIssues, setAvailableIssues] = useState([]);
@@ -31,8 +37,7 @@ const IssueForm = ({ projectId, projects = [], onClose, onCreated }) => {
         }
     }, [projectId, projects, selectedProjectId]);
 
-    useEffect(() => {
-        const loadParentOptions = async () => {
+    const loadParentOptions = async () => {
             if (!selectedProjectId) {
                 setAvailableIssues([]);
                 return;
@@ -44,13 +49,14 @@ const IssueForm = ({ projectId, projects = [], onClose, onCreated }) => {
             } catch (error) {
                 setAvailableIssues([]);
             }
-        };
+    };
 
+    useEffect(() => {
+        
         loadParentOptions();
     }, [selectedProjectId]);
 
-    useEffect(() => {
-        const searchAssignees = async () => {
+    const searchAssignees = async () => {
             const query = assigneeEmail.trim();
             if (!query || query.length < 2) {
                 setAssigneeSuggestions([]);
@@ -66,6 +72,7 @@ const IssueForm = ({ projectId, projects = [], onClose, onCreated }) => {
             }
         };
 
+    useEffect(() => {
         const timeoutId = setTimeout(searchAssignees, ASSIGNEE_SEARCH_DEBOUNCE);
         return () => clearTimeout(timeoutId);
     }, [assigneeEmail]);
@@ -93,7 +100,7 @@ const IssueForm = ({ projectId, projects = [], onClose, onCreated }) => {
                 story_points: storyPoints
             };
 
-            await api.post('/issues', payload);
+            await api.post(ROUTES.ISSUES, payload);
             onCreated();
             onClose();
         } catch (err) {

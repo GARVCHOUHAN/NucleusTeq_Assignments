@@ -1,5 +1,5 @@
-import Navbar from "../../components/common/navbar/Navbar";
-import Sidebar from "../../components/common/sidebar/Sidebar";
+﻿import Navbar from "../../components/project/common/navbar/Navbar";
+import Sidebar from "../../components/project/common/sidebar/Sidebar";
 import ProjectCard from "../../components/project/project-card/ProjectCard";
 import ProjectForm from "../../components/project/projectform/ProjectForm";
 import { useAuth } from "../../hooks/use-auth";

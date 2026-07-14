@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import IssueCard from "../components/IssueCard";
 import IssueForm from "../components/IssueForm";
-import Navbar from "../components/common/navbar/Navbar";
-import Sidebar from "../components/common/sidebar/Sidebar";
+import Navbar from "../components/project/common/navbar/Navbar";
+import Sidebar from "../components/project/common/sidebar/Sidebar";
 import { useProjects } from "../hooks/use-project";
 import IssueService from "../services/issue-service";
 import styles from "./IssuesList.module.css";

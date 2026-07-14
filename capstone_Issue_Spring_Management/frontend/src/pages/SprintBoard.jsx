@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 
-import Navbar from "../components/common/navbar/Navbar";
-import Sidebar from "../components/common/sidebar/Sidebar";
+import Navbar from "../components/project/common/navbar/Navbar";
+import Sidebar from "../components/project/common/sidebar/Sidebar";
 import { useProjects } from "../hooks/use-project";
 import IssueService from "../services/issue-service";
 import SprintService from "../services/sprint-service";

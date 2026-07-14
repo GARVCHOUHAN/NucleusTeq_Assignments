@@ -27,8 +27,5 @@ def register_user(user: UserRegisterRequest):
 
 
 @router.get("/users")
-def search_users(
-    search: str | None = Query(default=None),
-    current_user: dict = Depends(require_member)
-):
+def search_users(search: str | None = Query(default=None),current_user: dict = Depends(require_member)):
     return AuthService.search_users(search)

@@ -1,10 +1,10 @@
-﻿import {useState} from "react";
-import Input from "../../common/Input/Input";
-import Button from "../../common/Button/Button";
+﻿import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Input from "../project/common/input/Input";
+import Button from "../project/common/button/Button";
 import AuthService from "../../../services/auth-service";
-import {useAuth} from "../../../hooks/use-auth";
-import {useNavigate} from "react-router-dom";
-import {ROUTES} from "../../../constants/routes";
+import { useAuth } from "../../../hooks/use-auth";
+import { ROUTES } from "../../../constants/routes";
 
 function LoginForm(){
 
@@ -17,66 +17,57 @@ const [loading,setLoading]=useState(false);
 const [error,setError]=useState("");
 
 async function handleLogin(e){
-e.preventDefault();
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-setLoading(true);
-setError("");
+    try{
+    const response=await AuthService.login({email:email,password:password});
+    login(response);
+    navigate(ROUTES.DASHBOARD);
+    }
+    catch(err){
 
-try{
+    const detail=err.response?.data?.detail;
 
-const response=await AuthService.login({
-email:email,
-password:password
-});
+    if(Array.isArray(detail)){
+    setError(detail[0].msg);
+    }
+    else{
+        setError(detail || "Login failed");}
 
-login(response);
-
-navigate(ROUTES.DASHBOARD);
-
-}
-catch(err){
-
-const detail=err.response?.data?.detail;
-
-if(Array.isArray(detail)){
-setError(detail[0].msg);
-}
-else{
-setError(detail || "Login failed");
-}
-
-}
-finally{
-setLoading(false);
-}
+    }
+    finally{
+    setLoading(false);
+    }
 
 }
 
 
 return(
-<form onSubmit={handleLogin}>
+    <form onSubmit={handleLogin}>
 
-<Input
-label="Email"
-type="email"
-value={email}
-onChange={(e)=>setEmail(e.target.value)}
-/>
+    <Input
+    label="Email"
+    type="email"
+    value={email}
+    onChange={(e)=>setEmail(e.target.value)}
+    />
 
-<Input
-label="Password"
-type="password"
-value={password}
-onChange={(e)=>setPassword(e.target.value)}
-/>
+    <Input
+    label="Password"
+    type="password"
+    value={password}
+    onChange={(e)=>setPassword(e.target.value)}
+    />
 
-{error && <p>{error}</p>}
+    {error && <p>{error}</p>}
 
-<Button type="submit" disabled={loading}>
-{loading?"Logging In...":"Login"}
-</Button>
+    <Button type="submit" disabled={loading}>
+    {loading?"Logging In...":"Login"}
+    </Button>
 
-</form>
+    </form>
 );
 
 }

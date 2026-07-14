@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import Navbar from "../../components/common/navbar/Navbar";
-import Sidebar from "../../components/common/sidebar/Sidebar";
+import Navbar from "../../components/project/common/navbar/Navbar";
+import Sidebar from "../../components/project/common/sidebar/Sidebar";
 import { useAuth } from "../../hooks/use-auth";
 import DashboardService from "../../services/dashboard-service";
 import styles from "./Dashboard.module.css";

@@ -33,7 +33,6 @@ def _serialize_value(value: Any) -> Any:
 def _serialize_document(document: dict | None) -> dict | None:
     if document is None:
         return None
-
     return _serialize_value(document)
 
 

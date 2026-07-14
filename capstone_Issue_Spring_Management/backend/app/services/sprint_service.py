@@ -8,7 +8,15 @@ from app.exceptions.custom_exception import NotFoundException
 from app.repositories.issue_repository import IssueRepository
 from app.repositories.project_repository import ProjectRepository
 from app.repositories.sprint_repository import SprintRepository
+from app.schemas.response_schema import (
+    SprintCreatedResponse,
+    SprintStartedResponse,
+    SprintCompletedResponse,
+    IssueAddedToSprintResponse,
+    IssueRemovedFromSprintResponse
+)
 from app.utils.audit import generate_audit_fields
+from app.constants import (COMPLETED,PROJECT_ID,STATUS,DONE)
 
 
 class SprintService:
@@ -34,7 +42,7 @@ class SprintService:
         return SprintService._ensure_project_access(project_id, current_user)
 
     @staticmethod
-    def create_sprint(sprint_request, current_user: dict):
+    def create_sprint(sprint_request, current_user: dict) -> SprintCreatedResponse:
         SprintService._ensure_admin_or_member(
             sprint_request.project_id,
             current_user
@@ -52,10 +60,7 @@ class SprintService:
 
         result = SprintRepository.create_sprint(sprint_document)
 
-        return {
-            "message": "Sprint created successfully.",
-            "sprint_id": str(result.inserted_id)
-        }
+        return SprintCreatedResponse(sprint_id=str(result.inserted_id))
 
     @staticmethod
     def get_sprints(current_user: dict, project_id: str | None = None):
@@ -91,10 +96,10 @@ class SprintService:
         return sprint
 
     @staticmethod
-    def add_issue(sprint_id: str, issue_id: str, current_user: dict):
+    def add_issue(sprint_id: str, issue_id: str, current_user: dict) -> IssueAddedToSprintResponse:
         sprint = SprintService.get_sprint_by_id(sprint_id, current_user)
 
-        if sprint["status"] == "completed":
+        if sprint[STATUS] == COMPLETED:
             raise BadRequestException("Cannot add issues to a completed sprint.")
 
         issue = IssueRepository.get_issue_by_id(issue_id)
@@ -102,10 +107,10 @@ class SprintService:
         if issue is None:
             raise NotFoundException("Issue not found.")
 
-        if issue["project_id"] != sprint["project_id"]:
+        if issue[PROJECT_ID] != sprint["project_id"]:
             raise BadRequestException("Issue must belong to the sprint project.")
 
-        if issue["status"] == "DONE":
+        if issue["status"] == DONE:
             raise BadRequestException("Completed issues cannot be added to sprint.")
 
         if SprintRepository.issue_in_sprint(sprint_id, issue_id):
@@ -113,12 +118,10 @@ class SprintService:
 
         SprintRepository.add_issue(sprint_id, issue_id)
 
-        return {
-            "message": "Issue added to sprint successfully."
-        }
+        return IssueAddedToSprintResponse()
 
     @staticmethod
-    def remove_issue(sprint_id: str, issue_id: str, current_user: dict):
+    def remove_issue(sprint_id: str, issue_id: str, current_user: dict) -> IssueRemovedFromSprintResponse:
         SprintService.get_sprint_by_id(sprint_id, current_user)
 
         if not SprintRepository.issue_in_sprint(sprint_id, issue_id):
@@ -126,12 +129,10 @@ class SprintService:
 
         SprintRepository.remove_issue(sprint_id, issue_id)
 
-        return {
-            "message": "Issue removed from sprint successfully."
-        }
+        return IssueRemovedFromSprintResponse()
 
     @staticmethod
-    def start_sprint(sprint_id: str, current_user: dict):
+    def start_sprint(sprint_id: str, current_user: dict) -> SprintStartedResponse:
         sprint = SprintService.get_sprint_by_id(sprint_id, current_user)
 
         if sprint["status"] != "planned":
@@ -146,12 +147,10 @@ class SprintService:
             }
         )
 
-        return {
-            "message": "Sprint started successfully."
-        }
+        return SprintStartedResponse()
 
     @staticmethod
-    def complete_sprint(sprint_id: str, current_user: dict):
+    def complete_sprint(sprint_id: str, current_user: dict) -> SprintCompletedResponse:
         sprint = SprintService.get_sprint_by_id(sprint_id, current_user)
 
         if sprint["status"] != "active":
@@ -166,6 +165,4 @@ class SprintService:
             }
         )
 
-        return {
-            "message": "Sprint completed successfully."
-        }
+        return SprintCompletedResponse()

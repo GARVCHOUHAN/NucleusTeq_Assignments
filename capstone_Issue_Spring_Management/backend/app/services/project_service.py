@@ -7,13 +7,19 @@ from app.exceptions.custom_exception import (
     NotFoundException,
     ForbiddenException
 )
-
+from app.schemas.response_schema import (
+    ProjectCreatedResponse,
+    ProjectUpdatedResponse,
+    ProjectDeletedResponse,
+    MemberAddedResponse,
+    MemberRemovedResponse
+)
 from app.utils.audit import generate_audit_fields
 
 
 class ProjectService:
     @staticmethod
-    def create_project(project,current_user: dict):
+    def create_project(project, current_user: dict) -> ProjectCreatedResponse:
         if current_user["role"] != "ADMIN":
             raise ForbiddenException("Only admins can create projects.")
         existing_project = ProjectRepository.get_project_by_name(project.name)
@@ -50,16 +56,16 @@ class ProjectService:
             "description": project.description,
             "project_key": project.project_key,
             "members": members,
-            **generate_audit_fields(
-                current_user["email"]
-            )
+            **generate_audit_fields(current_user["email"])
         }
 
-        ProjectRepository.create_project(project_document)
+        result = ProjectRepository.create_project(project_document)
+        return ProjectCreatedResponse(project_id=str(result.inserted_id))
         
 
     @staticmethod
     def get_all_projects(current_user: dict):
+        # the projects should only be the ones the admin created or the ones the user is a member of
         if current_user["role"] != "ADMIN":
             raise ForbiddenException("Only admins can view all projects.")
         return ProjectRepository.get_all_projects()
@@ -86,7 +92,7 @@ class ProjectService:
         project_id: str,
         updated_project: dict,
         current_user: dict
-    ):
+    ) -> ProjectUpdatedResponse:
         if current_user["role"] != "ADMIN":
             raise ForbiddenException("Only admins can update projects.")
         project = ProjectRepository.get_project_by_id(project_id)
@@ -112,23 +118,20 @@ class ProjectService:
                 existing_key
                 and str(existing_key["_id"]) != project_id
             ):
-                raise AlreadyExistsException(
-                    "Project key already exists."
-                )
+                raise AlreadyExistsException("Project key already exists.")
 
         updated_project["updated_by"] = current_user["email"]
 
         updated_project["updated_at"] = datetime.now(timezone.utc)
 
-        ProjectRepository.update_project(
-            project_id,
-            updated_project
-        )
+        ProjectRepository.update_project(project_id, updated_project)
+
+        return ProjectUpdatedResponse()
 
         
 
     @staticmethod
-    def delete_project(project_id: str, current_user: dict):
+    def delete_project(project_id: str, current_user: dict) -> ProjectDeletedResponse:
         if current_user["role"] != "ADMIN":
             raise ForbiddenException("Only admins can delete projects.")
 
@@ -138,6 +141,7 @@ class ProjectService:
             raise NotFoundException("Project not found.")
 
         ProjectRepository.soft_delete_project(project_id)
+        return ProjectDeletedResponse()
         
 
     @staticmethod
@@ -145,7 +149,7 @@ class ProjectService:
         project_id: str,
         member_email: str,
         current_user: dict
-    ):
+    ) -> MemberAddedResponse:
         if current_user["role"] != "ADMIN":
             raise ForbiddenException("Only admins can manage project members.")
 
@@ -158,13 +162,11 @@ class ProjectService:
             project_id,
             member_email
         ):
-
             raise AlreadyExistsException("Member already assigned.")
 
         user = UserRepository.get_user_by_email(member_email)
 
         if user is None:
-
             raise NotFoundException("User not found.")
 
         ProjectRepository.add_member(
@@ -176,30 +178,30 @@ class ProjectService:
             }
         )
 
+        return MemberAddedResponse()
+
 
     @staticmethod
     def remove_member(
         project_id: str,
         email: str,
         current_user: dict
-    ):
+    ) -> MemberRemovedResponse:
         if current_user["role"] != "ADMIN":
             raise ForbiddenException("Only admins can manage project members.")
  
-
         if not ProjectRepository.member_exists(
             project_id,
             email
         ):
-
-            raise NotFoundException(
-                "Member not assigned."
-            )
+            raise NotFoundException("Member not assigned.")
 
         ProjectRepository.remove_member(
             project_id,
             email
         )
+
+        return MemberRemovedResponse()
 
 
     @staticmethod
