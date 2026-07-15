@@ -1,0 +1,194 @@
+.layout{
+display:flex;
+min-height:100vh;
+background:#f6f8fb;
+}
+
+.contentShell{
+flex:1;
+min-width:0;
+}
+
+.content{
+padding:30px;
+display:grid;
+gap:20px;
+}
+
+.headerSection{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:20px;
+}
+
+.kicker{
+margin:0 0 6px;
+font-size:12px;
+font-weight:800;
+text-transform:uppercase;
+letter-spacing:.08em;
+color:#0c66e4;
+}
+
+.headerSection h1{
+margin:0;
+font-size:30px;
+color:#172b4d;
+}
+
+.headerSection p{
+margin:6px 0 0;
+color:#626f86;
+}
+
+.toolbar,
+.sprintForm,
+.sprintCard{
+background:white;
+border:1px solid #dfe1e6;
+border-radius:8px;
+box-shadow:0 1px 2px rgba(9,30,66,.08);
+}
+
+.toolbar{
+padding:14px;
+}
+
+.toolbar label{
+max-width:360px;
+}
+
+.toolbar select,
+.sprintForm input,
+.sprintForm select,
+.issuePicker select{
+width:100%;
+padding:10px 12px;
+border:1px solid #dfe1e6;
+border-radius:6px;
+background:#fafbfc;
+}
+
+.sprintForm{
+display:grid;
+grid-template-columns:1.3fr 1fr auto auto auto;
+gap:12px;
+padding:14px;
+align-items:center;
+}
+
+.sprintForm button,
+.lifecycle button,
+.sprintIssue button{
+border:none;
+border-radius:6px;
+padding:10px 12px;
+background:#0c66e4;
+color:white;
+font-weight:700;
+}
+
+.lifecycle button:disabled{
+background:#cbd5e1;
+cursor:not-allowed;
+}
+
+.sprintGrid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:16px;
+}
+
+.sprintCard{
+padding:16px;
+display:grid;
+gap:14px;
+}
+
+.sprintHeader{
+display:flex;
+justify-content:space-between;
+gap:12px;
+align-items:flex-start;
+}
+
+.sprintHeader h3{
+margin:0;
+color:#172b4d;
+}
+
+.sprintHeader p,
+.sprintIssues p{
+margin:6px 0 0;
+color:#626f86;
+font-size:14px;
+}
+
+.status{
+padding:6px 10px;
+border-radius:999px;
+background:#e9f2ff;
+color:#0c66e4;
+font-size:12px;
+font-weight:800;
+text-transform:uppercase;
+}
+
+.lifecycle{
+display:flex;
+gap:8px;
+}
+
+.sprintIssues{
+display:grid;
+gap:8px;
+}
+
+.sprintIssue{
+display:flex;
+justify-content:space-between;
+gap:10px;
+align-items:center;
+padding:10px;
+border:1px solid #dfe1e6;
+border-radius:6px;
+background:#fafbfc;
+}
+
+.sprintIssue button{
+background:#dc2626;
+padding:7px 10px;
+}
+
+.errorBox{
+padding:12px 14px;
+background:#fee2e2;
+color:#991b1b;
+border:1px solid #fecaca;
+border-radius:8px;
+}
+
+.loading{
+padding:40px;
+text-align:center;
+color:#626f86;
+}
+
+@media(max-width:900px){
+.sprintForm{
+grid-template-columns:1fr 1fr;
+}
+}
+
+@media(max-width:640px){
+.sprintForm{
+grid-template-columns:1fr;
+}
+
+.sprintHeader,
+.sprintIssue{
+flex-direction:column;
+align-items:flex-start;
+}
+}

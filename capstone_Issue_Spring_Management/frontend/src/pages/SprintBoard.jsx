@@ -1,83 +1,295 @@
-﻿import { useState, useEffect } from 'react';
-import api from '../api/axiosConfig';
-import Navbar from '../components/Navbar';
-import IssueCard from '../components/IssueCard';
+import { useCallback, useEffect, useState } from "react";
 
-const SprintBoard = () => {
-    const [issues, setIssues] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+import Navbar from "../components/common/navbar/Navbar";
+import Sidebar from "../components/common/sidebar/Sidebar";
+import { useProjects } from "../hooks/use-project";
+import IssueService from "../services/issue-service";
+import SprintService from "../services/sprint-service";
+import styles from "./SprintBoard.module.css";
 
-    useEffect(() => {
-        const fetchIssues = async () => {
-            try {
-                // Adjust this route to match your FastAPI endpoint for fetching issues
-                // E.g., /api/issues or /api/sprints/{sprint_id}/issues
-                const response = await api.get('/issues'); 
-                setIssues(response.data);
-            } catch (err) {
-                setError('Failed to load sprint data.');
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
 
-        fetchIssues();
-    }, []);
+const today = new Date().toISOString().slice(0, 10);
 
-    // Group issues by status
-    const todoIssues = issues.filter(issue => issue.status === 'To Do');
-    const inProgressIssues = issues.filter(issue => issue.status === 'In Progress');
-    const doneIssues = issues.filter(issue => issue.status === 'Done');
 
-    const Column = ({ title, count, items }) => (
-        <div className="flex flex-col bg-gray-50 rounded-lg h-full p-4 min-w-[300px]">
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-gray-700">{title}</h3>
-                <span className="bg-gray-200 text-gray-600 rounded-full px-2 py-1 text-xs font-bold">
-                    {count}
-                </span>
-            </div>
-            <div className="flex-1 overflow-y-auto pr-1">
-                {items.length === 0 ? (
-                    <div className="text-sm text-gray-400 text-center mt-4 border-2 border-dashed border-gray-200 p-4 rounded">
-                        No issues here
-                    </div>
-                ) : (
-                    items.map(issue => <IssueCard key={issue.id} issue={issue} />)
-                )}
-            </div>
-        </div>
+const initialForm = {
+    name: "",
+    project_id: "",
+    start_date: today,
+    end_date: today
+};
+
+function validateSprint(form, sprints) {
+    const startDate = new Date(form.start_date);
+    const endDate = new Date(form.end_date);
+
+    if (startDate > endDate) {
+        return "Sprint start date must be before end date.";
+    }
+
+    const duplicateSprint = sprints.some(
+        (sprint) =>
+            sprint.name.toLowerCase() === form.name.toLowerCase() &&
+            sprint.project_id === form.project_id
     );
 
-    return (
-        <div className="min-h-screen bg-gray-100 flex flex-col">
-            <Navbar />
-            
-            <main className="flex-1 container mx-auto p-6 overflow-hidden flex flex-col">
-                <header className="mb-6 flex justify-between items-end">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-800">Active Sprint</h1>
-                        <p className="text-gray-500">Sprint 1: Authentication & Foundations</p>
-                    </div>
-                    <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow transition font-semibold">
-                        + Create Issue
-                    </button>
-                </header>
+    if (duplicateSprint) {
+        return "Sprint with this name already exists in this project.";
+    }
 
-                {error && <div className="bg-red-100 text-red-600 p-3 rounded mb-4">{error}</div>}
-                
-                {loading ? (
-                    <div className="flex-1 flex items-center justify-center text-gray-500">Loading board...</div>
-                ) : (
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden pb-4">
-                        <Column title="TO DO" count={todoIssues.length} items={todoIssues} />
-                        <Column title="IN PROGRESS" count={inProgressIssues.length} items={inProgressIssues} />
-                        <Column title="DONE" count={doneIssues.length} items={doneIssues} />
-                    </div>
-                )}
-            </main>
+
+    const overlappingSprint = sprints.some((sprint) => {
+        if (sprint.project_id !== form.project_id) {
+            return false;
+        }
+
+        const existingStart = new Date(sprint.start_date);
+        const existingEnd = new Date(sprint.end_date);
+
+        return startDate <= existingEnd && endDate >= existingStart;
+    });
+
+    if (overlappingSprint) {
+        return "Sprint dates overlap with another sprint in this project.";
+    }
+
+
+    return "";
+}
+
+const SprintBoard = () => {
+    const { projects } = useProjects();
+    const [sprints, setSprints] = useState([]);
+    const [issues, setIssues] = useState([]);
+    const [selectedProjectId, setSelectedProjectId] = useState("");
+    const [form, setForm] = useState(initialForm);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    const loadSprintData = useCallback(async () => {
+        setLoading(true);
+        setError("");
+
+        try {
+            const [sprintData, issueData] = await Promise.all([
+                SprintService.getSprints(selectedProjectId),
+                IssueService.getIssues({
+                    project_id: selectedProjectId || undefined
+                })
+            ]);
+            setSprints(sprintData);
+            setIssues(Array.isArray(issueData) ? issueData : issueData.items || []);
+        } catch (error) {
+            setError(error.response?.data?.detail || "Unable to load sprint data.");
+        } finally {
+            setLoading(false);
+        }
+    }, [selectedProjectId]);
+
+    useEffect(() => {
+        loadSprintData();
+    }, [loadSprintData]);
+
+    useEffect(() => {
+        if (!form.project_id && projects.length > 0) {
+            setForm((current) => ({
+                ...current,
+                project_id: projects[0]._id
+            }));
+        }
+    }, [projects, form.project_id]);
+
+    function updateForm(event) {
+        setForm({
+            ...form,
+            [event.target.name]: event.target.value
+        });
+    }
+
+    async function createSprint(event) {
+    event.preventDefault();
+    setError("");
+
+
+    const validationError = validateSprint(form, sprints);
+
+    if (validationError) {
+        setError(validationError);
+        return;
+    }
+
+
+    try {
+        await SprintService.createSprint(form);
+
+        setForm({
+            ...initialForm,
+            project_id: form.project_id
+        });
+
+        await loadSprintData();
+
+    } catch (error) {
+        setError(
+            error.response?.data?.detail ||
+            "Unable to create sprint."
+        );
+    }
+    }
+
+    async function addIssue(sprintId, issueId) {
+        setError("");
+
+        try {
+            await SprintService.addIssue(sprintId, issueId);
+            await loadSprintData();
+        } catch (error) {
+            setError(error.response?.data?.detail || "Unable to add issue.");
+        }
+    }
+
+    async function removeIssue(sprintId, issueId) {
+        setError("");
+
+        try {
+            await SprintService.removeIssue(sprintId, issueId);
+            await loadSprintData();
+        } catch (error) {
+            setError(error.response?.data?.detail || "Unable to remove issue.");
+        }
+    }
+
+    async function startSprint(sprintId) {
+
+    const sprint = sprints.find(
+        (item) => item._id === sprintId
+    );
+
+
+    if(new Date(sprint.start_date) > new Date()) {
+        setError(
+            "Sprint cannot be started before start date."
+        );
+        return;
+    }
+
+
+    await SprintService.startSprint(sprintId);
+    await loadSprintData();
+    }
+
+    async function completeSprint(sprintId) {
+
+    const sprint = sprints.find(
+        (item) => item._id === sprintId
+    );
+
+
+    if (sprint.status !== "active") {
+        setError(
+            "Only active sprint can be completed."
+        );
+        return;
+    }
+
+
+    await SprintService.completeSprint(sprintId);
+    await loadSprintData();
+    }
+
+    const availableIssues = issues.filter((issue) => issue.status !== "DONE");
+
+    return (
+        <div className={styles.layout}>
+            <Sidebar />
+            <div className={styles.contentShell}>
+                <Navbar />
+                <main className={styles.content}>
+                    <section className={styles.headerSection}>
+                        <div>
+                            <p className={styles.kicker}>Sprint Planning</p>
+                            <h1>Sprints</h1>
+                            <p>Create sprint cycles, add work, and manage lifecycle.</p>
+                        </div>
+                    </section>
+
+                    {error && <div className={styles.errorBox}>{error}</div>}
+
+                    <section className={styles.toolbar}>
+                        <label>
+                            Project filter
+                            <select value={selectedProjectId} onChange={(event) => setSelectedProjectId(event.target.value)}>
+                                <option value="">All projects</option>
+                                {projects.map((project) => (
+                                    <option key={project._id} value={project._id}>{project.name}</option>
+                                ))}
+                            </select>
+                        </label>
+                    </section>
+
+                    <form className={styles.sprintForm} onSubmit={createSprint}>
+                        <input name="name" placeholder="Sprint name" value={form.name} onChange={updateForm} required />
+                        <select name="project_id" value={form.project_id} onChange={updateForm} required>
+                            <option value="">Select project</option>
+                            {projects.map((project) => (
+                                <option key={project._id} value={project._id}>{project.name}</option>
+                            ))}
+                        </select>
+                        <input type="date" name="start_date" value={form.start_date} min={today} onChange={updateForm} required />
+                        <input type="date" name="end_date" value={form.end_date} min={form.start_date} onChange={updateForm} required />
+                        <button type="submit">Create Sprint</button>
+                    </form>
+
+                    {loading ? (
+                        <div className={styles.loading}>Loading sprints...</div>
+                    ) : (
+                        <section className={styles.sprintGrid}>
+                            {sprints.length ? sprints.map((sprint) => (
+                                <article key={sprint._id} className={styles.sprintCard}>
+                                    <div className={styles.sprintHeader}>
+                                        <div>
+                                            <h3>{sprint.name}</h3>
+                                            <p>{sprint.start_date} to {sprint.end_date}</p>
+                                        </div>
+                                        <span className={styles.status}>{sprint.status}</span>
+                                    </div>
+
+                                    <div className={styles.lifecycle}>
+                                        <button type="button" disabled={sprint.status !== "planned"} onClick={() => startSprint(sprint._id)}>
+                                            Start
+                                        </button>
+                                        <button type="button" disabled={sprint.status !== "active"} onClick={() => completeSprint(sprint._id)}>
+                                            Complete
+                                        </button>
+                                    </div>
+
+                                    <div className={styles.issuePicker}>
+                                        <select onChange={(event) => event.target.value && addIssue(sprint._id, event.target.value)} defaultValue="">
+                                            <option value="">Add issue</option>
+                                            {availableIssues
+                                                .filter((issue) => issue.project_id === sprint.project_id && !sprint.issue_ids?.includes(issue.id))
+                                                .map((issue) => (
+                                                    <option key={issue.id} value={issue.id}>{issue.issue_key} - {issue.title}</option>
+                                                ))}
+                                        </select>
+                                    </div>
+
+                                    <div className={styles.sprintIssues}>
+                                        {(sprint.issue_ids || []).length ? sprint.issue_ids.map((issueId) => {
+                                            const issue = issues.find((item) => item.id === issueId);
+                                            return (
+                                                <div key={issueId} className={styles.sprintIssue}>
+                                                    <span>{issue ? `${issue.issue_key} - ${issue.title}` : issueId}</span>
+                                                    <button type="button" onClick={() => removeIssue(sprint._id, issueId)}>Remove</button>
+                                                </div>
+                                            );
+                                        }) : <p>No issues in this sprint.</p>}
+                                    </div>
+                                </article>
+                            )) : <p>No sprints found.</p>}
+                        </section>
+                    )}
+                </main>
+            </div>
         </div>
     );
 };
