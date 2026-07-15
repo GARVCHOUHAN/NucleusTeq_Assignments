@@ -1,38 +1,68 @@
-﻿import { createContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+﻿import { useEffect, useState } from "react";
+import { AuthContext } from "./auth-context";
 
-export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+export function AuthProvider({ children }) {
+    const [currentUser, setCurrentUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // create a utility function for adding the details in local storage, also make the function generics
+    const setLocalStorageItem = (key, value) => {
+        localStorage.setItem(key, JSON.stringify(value));
+    };
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                // Assuming your FastAPI JWT payload includes 'role' and 'sub'
-                setUser({ username: decoded.sub, role: decoded.role });
-            } catch (error) {
-                localStorage.removeItem('token');
-            }
+        const savedUser = localStorage.getItem("currentUser");
+
+        if (savedUser) {
+            setCurrentUser(
+                JSON.parse(savedUser)
+            );
         }
+
+        setLoading(false);
     }, []);
 
-    const login = (token) => {
-        localStorage.setItem('token', token);
-        const decoded = jwtDecode(token);
-        setUser({ username: decoded.sub, role: decoded.role });
+    const login = (authPayload) => {
+        const user = authPayload.user || authPayload;
+        const token = authPayload.access_token || authPayload.token;
+
+        localStorage.setItem(
+            "currentUser",
+            JSON.stringify(user)
+        );
+
+        if (token) {
+            localStorage.setItem(
+                "authToken",
+                token
+            );
+        }
+
+        setCurrentUser(user);
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
-        setUser(null);
+        localStorage.removeItem(
+            "currentUser"
+        );
+        localStorage.removeItem(
+            "authToken"
+        );
+        setCurrentUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider
+            value={{
+                currentUser,
+                login,
+                logout,
+                loading,
+                isAuthenticated: currentUser !== null
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );
-};
+}
