@@ -20,9 +20,10 @@ ALLOWED_TRANSITIONS = {
     "DONE": []
 }
 
+ALLOWED_UPDATE_FIELDS = {"title", "description", "assignee_email", "issue_type", "priority", "story_points"}
+
 
 class IssueService:
-    
     @staticmethod
     def _format_issue(issue: dict):
         if issue is None:
@@ -32,6 +33,7 @@ class IssueService:
         formatted["id"] = formatted.get("_id")
         formatted["assignee"] = formatted.get("assignee_email")
         formatted["reporter"] = formatted.get("reporter_email")
+        formatted["parent_id"] = formatted.get("parent_id")
         formatted["priority"] = formatted.get("priority", "Medium")
         formatted["story_points"] = formatted.get("story_points", 0)
 
@@ -93,14 +95,26 @@ class IssueService:
             )
 
     @staticmethod
-    def _ensure_issue_access(issue: dict, current_user: dict):
+    def _ensure_status_update_access(issue: dict, current_user: dict):
         if current_user["role"] == "ADMIN":
             return
 
         if issue.get("assignee_email") != current_user["email"]:
             raise ForbiddenException(
-                "Only assigned users or admin can update this issue."
+                "Only the assignee or admin can update issue status."
             )
+
+    @staticmethod
+    def _ensure_edit_access(issue: dict, current_user: dict):
+        if current_user["role"] == "ADMIN":
+            return
+
+        if issue.get("assignee_email") == current_user["email"] or issue.get("reporter_email") == current_user["email"]:
+            return
+
+        raise ForbiddenException(
+            "Only the reporter, assignee, or admin can edit this issue."
+        )
 
     @staticmethod
     def create_issue(issue_request, current_user: dict):
@@ -130,10 +144,18 @@ class IssueService:
             issue_request.project_id
         )
 
+        if issue_request.parent_id:
+            parent_issue = IssueRepository.get_issue_by_id(issue_request.parent_id)
+            if parent_issue is None:
+                raise NotFoundException("Parent issue not found.")
+            if parent_issue.get("project_id") != issue_request.project_id:
+                raise BadRequestException("Parent issue must belong to the same project.")
+
         issue_document = {
             "title": issue_request.title,
             "description": issue_request.description,
             "project_id": issue_request.project_id,
+            "parent_id": issue_request.parent_id,
             "reporter_email": current_user["email"],
             "assignee_email": issue_request.assignee_email,
             "issue_type": issue_request.issue_type.value,
@@ -158,7 +180,7 @@ class IssueService:
         if issue is None:
             raise NotFoundException("Issue not found.")
 
-        if current_user["role"] != "ADMIN" and not ProjectRepository.member_exists(
+        if current_user["role"] not in ("ADMIN", "VIEWER") and not ProjectRepository.member_exists(
             issue["project_id"],
             current_user["email"]
         ):
@@ -188,7 +210,7 @@ class IssueService:
 
     @staticmethod
     def get_all_issues(current_user: dict):
-        if current_user["role"] == "ADMIN":
+        if current_user["role"] in ("ADMIN", "VIEWER"):
             issues = IssueRepository.get_all_issues()
         else:
             projects = ProjectRepository.get_projects_by_member(
@@ -231,7 +253,7 @@ class IssueService:
         if project_id:
             IssueService._validate_project_access(project_id, current_user)
 
-        if current_user["role"] != "ADMIN" and not project_id:
+        if current_user["role"] not in ("ADMIN", "VIEWER") and not project_id:
             projects = ProjectRepository.get_projects_by_member(
                 current_user["email"]
             )
@@ -273,13 +295,31 @@ class IssueService:
         return formatted_issues
 
     @staticmethod
+    def get_subtasks(issue_id: str, current_user: dict):
+        issue = IssueRepository.get_issue_by_id(issue_id)
+
+        if issue is None:
+            raise NotFoundException("Issue not found.")
+
+        IssueService._validate_project_access(issue["project_id"], current_user)
+
+        return [
+            IssueService._format_issue(subtask)
+            for subtask in IssueRepository.get_issues_by_parent_id(issue_id)
+        ]
+
+    @staticmethod
     def update_issue(issue_id: str, updated_issue: dict, current_user: dict):
         issue = IssueRepository.get_issue_by_id(issue_id)
 
         if issue is None:
             raise NotFoundException("Issue not found.")
 
-        IssueService._ensure_issue_access(issue, current_user)
+        invalid_fields = set(updated_issue.keys()) - ALLOWED_UPDATE_FIELDS
+        if invalid_fields:
+            raise BadRequestException(f"Cannot update fields: {', '.join(invalid_fields)}")
+
+        IssueService._ensure_edit_access(issue, current_user)
 
         if "assignee_email" in updated_issue and updated_issue["assignee_email"] is not None:
             IssueService._validate_assignee(
@@ -306,7 +346,7 @@ class IssueService:
         if issue is None:
             raise NotFoundException("Issue not found.")
 
-        IssueService._ensure_issue_access(issue, current_user)
+        IssueService._ensure_status_update_access(issue, current_user)
 
         if status == issue["status"]:
             return {
@@ -333,4 +373,20 @@ class IssueService:
 
         return {
             "message": "Issue status updated successfully."
+        }
+
+    @staticmethod
+    def delete_issue(issue_id: str, current_user: dict):
+        issue = IssueRepository.get_issue_by_id(issue_id)
+
+        if issue is None:
+            raise NotFoundException("Issue not found.")
+
+        if current_user["role"] != "ADMIN" and issue.get("reporter_email") != current_user["email"]:
+            raise ForbiddenException("Only the reporter or admin can delete this issue.")
+
+        IssueRepository.delete_issue(issue_id)
+
+        return {
+            "message": "Issue deleted successfully."
         }

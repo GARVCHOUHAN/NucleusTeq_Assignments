@@ -3,6 +3,7 @@ Utility functions for audit fields.
 """
 
 from datetime import datetime
+from datetime import timezone
 from typing import Dict
 
 
@@ -12,7 +13,7 @@ def generate_audit_fields(current_user_email: str) -> Dict:
     MongoDB documents.
     """
 
-    current_time = datetime.utcnow()
+    current_time = datetime.now(timezone.utc)
 
     return {
 
